@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+        <!--<style name="MyActionBarTheme" parent="@style/Theme.AppCompat.Light.DarkActionBar">-->
+                <!--<item name="android:actionBarStyle" tools:targetApi="11">@style/MyActionBar</item>-->
+                <!--<item name="actionBarStyle">@style/MyActionBar</item>-->
+                <!--<item name="android:colorPrimary">@color/color_primary</item>-->
+                <!--<item name="android:colorPrimaryDark">@color/color_primary_dark</item>-->
+                <!--<item name="android:colorAccent">@color/color_accent</item>-->
+        <!--</style>-->
+        <style name="ButtonFloatStyle">
+                <item name="android:background">@drawable/button_style</item>
+                <item name="android:elevation">5dp</item>
+                <item name="android:translationZ">10dp</item>
+
+        </style>
+</resources>

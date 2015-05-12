@@ -1,0 +1,52 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/color_primary</item>
+        <item name="colorPrimaryDark">@color/color_primary_dark</item>
+        <item name="android:textColorPrimary">@color/color_secondary_text</item>
+    </style>
+
+
+    <!--<style name="MyActionBarTheme" parent="@style/Theme.AppCompat.Light.DarkActionBar">-->
+        <!--<item name="android:actionBarStyle" tools:targetApi="11">@style/MyActionBar</item>-->
+        <!--<item name="actionBarStyle">@style/MyActionBar</item>-->
+        <!--&lt;!&ndash;<item name="android:colorPrimary">@color/colorPrimary</item>&ndash;&gt;-->
+        <!--&lt;!&ndash;<item name="android:colorPrimaryDark">@color/colorPrimaryDark</item>&ndash;&gt;-->
+        <!--&lt;!&ndash;<item name="android:colorAccent">@color/colorPrimaryDark</item>&ndash;&gt;-->
+    <!--</style>-->
+<!--<style name="Navigation" parent="Theme.AppCompat.Light.NoActionBar">-->
+
+<!--</style>-->
+    <!--<style name="MyActionBar" parent="@style/Widget.AppCompat.ActionBar">-->
+        <!--<item name="background">@color/color_primary</item>-->
+        <!--<item name="titleTextStyle" tools:targetApi="11">@style/MyActionBarTitle</item>-->
+
+    <!--</style>-->
+
+    <!--<style name="ButtonFloatStyle">-->
+        <!--<item name="android:colorBackground">@drawable/button_style</item>-->
+    <!--</style>-->
+
+    <!--<style name="MyActionBarTitle" parent="@style/TextAppearance.AppCompat.Widget.ActionBar.Title">-->
+        <!--<item name="android:textColor">@color/color_primary_light</item>-->
+    <!--</style>-->
+
+
+
+
+    <style name="Theme.Whtsnxt" parent="@style/Theme.AppCompat.Light.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <!-- colorPrimary is used for the default action bar background -->
+        <item name="windowActionModeOverlay">true</item>
+        <item name="android:textColorPrimary">@color/color_primary_text</item>
+        <item name="colorPrimary">@color/color_primary</item>
+        <item name="colorPrimaryDark">@color/color_primary_dark</item>
+
+        <item name="android:windowBackground">@color/color_icons</item>
+        <item name="android:colorBackground">@color/color_icons</item>
+
+    </style>
+
+</resources>
