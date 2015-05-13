@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v4.widget.SimpleCursorAdapter;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -24,7 +23,7 @@ import android.widget.ListView;
 
 import com.example.dima.teacherorganizer.DataBase.TeacherDataBase;
 import com.example.dima.teacherorganizer.R;
-import com.example.dima.teacherorganizer.RegistrationTeacher;
+import com.example.dima.teacherorganizer.TeacherRegistration;
 import com.gc.materialdesign.views.ButtonFloat;
 
 import java.util.ArrayList;
@@ -123,7 +122,7 @@ public class TeachersFragment extends Fragment implements AbsListView.OnItemClic
 
         from = new String[]{TeacherDataBase.TeachersTable.TEACHER_NAME};
         to = new int[]{R.id.name};
-//        mAdapter = new SimpleCursorAdapter(getActivity(), R.layout.item_list_fragment, cursor, from, to);
+//        mAdapter = new SimpleCursorAdapter(getActivity(), R.layout.item_list_fragment, cursor, from, to,0);
 
         mListView = (ListView) view.findViewById(R.id.list);
 
@@ -137,7 +136,7 @@ public class TeachersFragment extends Fragment implements AbsListView.OnItemClic
         addTeacher.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent myIntent = new Intent(getActivity(), RegistrationTeacher.class);
+                Intent myIntent = new Intent(getActivity(), TeacherRegistration.class);
                 startActivityForResult(myIntent, 1);
             }
         });

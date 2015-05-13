@@ -59,10 +59,10 @@ public class NavigationDrawer extends ActionBarActivity implements TeachersFragm
         navigationDrawer.withHeader(R.layout.drawer_image);
         navigationDrawer.addDrawerItems(
                 new PrimaryDrawerItem().withName(R.string.students)
-
                         .withIcon(getResources().getDrawable(R.drawable.ic_account_multiple_black_24dp)),
-                new PrimaryDrawerItem().withName(R.string.teachers)
-                        .withIcon(FontAwesome.Icon.faw_user),
+
+//                new PrimaryDrawerItem().withName(R.string.teachers)
+//                        .withIcon(FontAwesome.Icon.faw_user),
 
                 new PrimaryDrawerItem().withName(R.string.groups)
                         .withIcon(FontAwesome.Icon.faw_group),
@@ -225,7 +225,7 @@ public class NavigationDrawer extends ActionBarActivity implements TeachersFragm
 //            floatButton.setOnClickListener(new View.OnClickListener() {
 //                @Override
 //                public void onClick(View v) {
-//                    Intent myIntent = new Intent(getActivity(), RegistrationTeacher.class);
+//                    Intent myIntent = new Intent(getActivity(), TeacherRegistration.class);
 //                    startActivityForResult(myIntent, 1);
 //                }
 //            });

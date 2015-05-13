@@ -7,7 +7,9 @@
         <item name="colorPrimaryDark">@color/color_primary_dark</item>
         <item name="android:textColorPrimary">@color/color_secondary_text</item>
     </style>
-
+<style name="ButtonFloatStyle" parent="Widget.AppCompat.Button">
+    <item name="android:background">@color/color_primary</item>
+</style>
 
     <!--<style name="MyActionBarTheme" parent="@style/Theme.AppCompat.Light.DarkActionBar">-->
         <!--<item name="android:actionBarStyle" tools:targetApi="11">@style/MyActionBar</item>-->
@@ -16,9 +18,9 @@
         <!--&lt;!&ndash;<item name="android:colorPrimaryDark">@color/colorPrimaryDark</item>&ndash;&gt;-->
         <!--&lt;!&ndash;<item name="android:colorAccent">@color/colorPrimaryDark</item>&ndash;&gt;-->
     <!--</style>-->
-<!--<style name="Navigation" parent="Theme.AppCompat.Light.NoActionBar">-->
+<style name="Navigation" parent="Theme.AppCompat.Light.NoActionBar">
 
-<!--</style>-->
+</style>
     <!--<style name="MyActionBar" parent="@style/Widget.AppCompat.ActionBar">-->
         <!--<item name="background">@color/color_primary</item>-->
         <!--<item name="titleTextStyle" tools:targetApi="11">@style/MyActionBarTitle</item>-->

@@ -10,8 +10,8 @@
     <color name="color_divider">#B6B6B6</color>
 
     <!--<color name="colorPrimary">#64B5F6</color>-->
-    <color name="colorBackgroundOrFon">#90CAF9</color>
-    <!--<color name="colorPrimaryDark">#1E88E5</color>-->
+    <color name="color_background_or_fon">#90CAF9</color>
+    <color name="color_error">#ffe57d7e</color>
 
     <!--<color name="colorActionBarTextOrCards">#E3F2FD</color>-->
 

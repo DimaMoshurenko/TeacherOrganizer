@@ -1,9 +1,11 @@
 package com.example.dima.teacherorganizer;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
@@ -11,15 +13,17 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.example.dima.teacherorganizer.DataBase.TeacherDataBase;
 import com.gc.materialdesign.views.ButtonFlat;
+import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.rengwuxian.materialedittext.MaterialEditText;
 import com.rengwuxian.materialedittext.validation.METValidator;
 import com.rengwuxian.materialedittext.validation.RegexpValidator;
 
 
-public class RegistrationTeacher extends ActionBarActivity {
+public class TeacherRegistration extends ActionBarActivity {
     private static final int FLOAT_LABEL_TEXT_SIZE = 20;
     private static final int FLOAT_LABEL = 2;
     private SQLiteDatabase database;
@@ -43,12 +47,6 @@ public class RegistrationTeacher extends ActionBarActivity {
         }
     }
 
-    private void setSettingMaterialEditText(MaterialEditText text, String nextName) {
-        text.setPrimaryColor(getResources().getColor(R.color.color_primary));
-        text.setFloatingLabel(FLOAT_LABEL);
-        text.setFloatingLabelText(nextName);
-        text.setFloatingLabelTextSize(FLOAT_LABEL_TEXT_SIZE);
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,7 +86,7 @@ public class RegistrationTeacher extends ActionBarActivity {
                 surname.addValidator(notEmpty);
                 middleName.addValidator(notEmpty);
                 RegexpValidator validator = new RegexpValidator(getResources().getString(R.string.passwords_are_different), " ");
-                RegexpValidator validatorLogin = new RegexpValidator(getResources().getString(R.string.passwords_are_different), " ");
+                RegexpValidator validatorLogin = new RegexpValidator(getResources().getString(R.string.login_are_different), " ");
 //                passwordRepeat.validate(" ", getResources().getString(R.string.passwords_are_different));
                 if (password.validate() & passwordRepeat.validate() & login.validate() & teacherName.validate()
                         & surname.validate() & middleName.validate()) {
@@ -96,7 +94,10 @@ public class RegistrationTeacher extends ActionBarActivity {
                         password.validateWith(validator);
                         passwordRepeat.validateWith(validator);
                     } else {
-                        if (!isValidationLogin(login.getText().toString())) {
+                        TeacherDataBase db = new TeacherDataBase(TeacherRegistration.this);
+                        database = db.getWritableDatabase();
+
+                        if (!isValidationLogin(login.getText().toString(), database)) {
 
 
                             ContentValues contentValues = new ContentValues();
@@ -104,16 +105,15 @@ public class RegistrationTeacher extends ActionBarActivity {
                                     + teacherName.getText().toString() + " " + middleName.getText().toString());
                             contentValues.put(TeacherDataBase.TeachersTable.LOGIN, login.getText().toString());
                             contentValues.put(TeacherDataBase.TeachersTable.PASSWORD, password.getText().toString());
-                            TeacherDataBase db = new TeacherDataBase(RegistrationTeacher.this);
 
-                            database = db.getWritableDatabase();
 
                             database.insert(TeacherDataBase.TeachersTable.TABLE_NAME, null, contentValues);
+                            database.close();
                             Log.e("TAG", " add new teacher ");
-                            Intent intent = new Intent(RegistrationTeacher.this, NavigationDrawer.class);
-//                        database.close();
+                            Intent intent = new Intent(TeacherRegistration.this, NavigationDrawer.class);
                             startActivity(intent);
-                        }else {
+                            finish();
+                        } else {
                             login.validateWith(validatorLogin);
                         }
                     }
@@ -123,7 +123,6 @@ public class RegistrationTeacher extends ActionBarActivity {
 
 
         });
-
     }
 
     @Override
@@ -148,19 +147,42 @@ public class RegistrationTeacher extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private boolean isValidationLogin(String login) {
-        Cursor cursor = database.query(TeacherDataBase.TeachersTable.TABLE_NAME, new String[]{TeacherDataBase.TeachersTable.LOGIN},
+    public static boolean isValidationLogin(final String login, final SQLiteDatabase database) {
+        boolean result = false;
+        final SQLiteDatabase finalDb = database;
+
+        Cursor cursor = finalDb.query(TeacherDataBase.TeachersTable.TABLE_NAME,
+                new String[]{TeacherDataBase.TeachersTable.LOGIN},
                 null, null, null, null, null);
         if (cursor.moveToFirst()) {
             do {
                 String loginCursor = cursor.getString(cursor.getColumnIndex(TeacherDataBase.TeachersTable.LOGIN));
                 if (login.equals(loginCursor)) {
-                    cursor.close();
-                    return true;
+                    result = true;
+                    //result[0] = true;
+                    break;
                 }
             } while (cursor.moveToNext());
         }
+
         cursor.close();
-        return false;
+        return result;
+    }
+
+    public static void setSettingMaterialEditText(MaterialEditText text, String nextName, Context context) {
+        text.setPrimaryColor(context.getResources().getColor(R.color.color_primary_dark));
+        text.setUnderlineColor(context.getResources().getColor(R.color.color_primary_dark));
+        text.setFloatingLabel(FLOAT_LABEL);
+        text.setFloatingLabelText(nextName);
+        text.setFloatingLabelTextSize(FLOAT_LABEL_TEXT_SIZE);
+    }
+
+    private void setSettingMaterialEditText(MaterialEditText text, String nextName) {
+
+        text.setPrimaryColor(getResources().getColor(R.color.color_primary));
+        text.setFloatingLabel(FLOAT_LABEL);
+        text.setFloatingLabelText(nextName);
+        text.setFloatingLabelTextSize(FLOAT_LABEL_TEXT_SIZE);
+
     }
 }

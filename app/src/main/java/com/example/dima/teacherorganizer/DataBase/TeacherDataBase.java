@@ -33,6 +33,8 @@ public class TeacherDataBase extends SQLiteOpenHelper {
     private static final String CREATE_STUDENT_TABLE = "CREATE TABLE " + StudentTable.TABLE_NAME +
             " ( " + StudentTable.ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             StudentTable.STUDENT_NAME + " VARCHAR(300), " +
+            StudentTable.TELEPHONE_NUMBER +  " VARCHAR(15), "+
+            StudentTable.STUDENT_MAIL +  " VARCHAR(100), "+
             StudentTable._ID_GROUP + " INTEGER )";
 
     private static final String CREATE_TEACHER_SUBJECT_TABLE = "CREATE TABLE " + TeacherSubjectTable.TABLE_NAME +
@@ -140,6 +142,9 @@ public class TeacherDataBase extends SQLiteOpenHelper {
 
         public static final String ID = BaseColumns._ID;
         public static final String STUDENT_NAME = "Student_Name";
+        public static final String STUDENT_MAIL = "Mail";
+
+        public static final String  TELEPHONE_NUMBER ="telephone_number";
         public static final String _ID_GROUP = "_id_Group";
     }
 
