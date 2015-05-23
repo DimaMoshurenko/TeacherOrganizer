@@ -1,11 +1,10 @@
-package com.example.dima.teacherorganizer;
+package com.example.dima.teacherorganizer.RegistrationActivity;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
@@ -13,11 +12,11 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 import com.example.dima.teacherorganizer.DataBase.TeacherDataBase;
+import com.example.dima.teacherorganizer.NavigationDrawer;
+import com.example.dima.teacherorganizer.R;
 import com.gc.materialdesign.views.ButtonFlat;
-import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.rengwuxian.materialedittext.MaterialEditText;
 import com.rengwuxian.materialedittext.validation.METValidator;
 import com.rengwuxian.materialedittext.validation.RegexpValidator;
@@ -26,14 +25,11 @@ import com.rengwuxian.materialedittext.validation.RegexpValidator;
 public class TeacherRegistration extends ActionBarActivity {
     private static final int FLOAT_LABEL_TEXT_SIZE = 20;
     private static final int FLOAT_LABEL = 2;
+    public static final String ID_ALL_TABLES = "id all tables";
     private SQLiteDatabase database;
+    private ButtonFlat addTeacher;
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-    }
-
-    private class NotEmptyValidator extends METValidator {
+    public static class NotEmptyValidator extends METValidator {
 
         public NotEmptyValidator(String errorMessage) {
             super(errorMessage);
@@ -52,13 +48,13 @@ public class TeacherRegistration extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registration_teacher);
-        final MaterialEditText teacherName = (MaterialEditText) findViewById(R.id.name_teacher);
+        final MaterialEditText teacherName = (MaterialEditText) findViewById(R.id.new_name_student);
         setSettingMaterialEditText(teacherName, getResources().getString(R.string.name_teacher));
 
         final MaterialEditText surname = (MaterialEditText) findViewById(R.id.surname);
         setSettingMaterialEditText(surname, getResources().getString(R.string.surname));
 
-        final MaterialEditText middleName = (MaterialEditText) findViewById(R.id.middle_name);
+        final MaterialEditText middleName = (MaterialEditText) findViewById(R.id.new_middle_name_student);
         setSettingMaterialEditText(middleName, getResources().getString(R.string.middle_name));
 
         final MaterialEditText login = (MaterialEditText) findViewById(R.id.login);
@@ -71,7 +67,7 @@ public class TeacherRegistration extends ActionBarActivity {
         setSettingMaterialEditText(passwordRepeat, getResources().getString(R.string.password_repeat));
 
 
-        ButtonFlat addTeacher = (ButtonFlat) findViewById(R.id.add_teacher);
+        addTeacher = (ButtonFlat) findViewById(R.id.add_teacher);
 
         addTeacher.setOnClickListener(new View.OnClickListener() {
 
@@ -98,20 +94,23 @@ public class TeacherRegistration extends ActionBarActivity {
                         database = db.getWritableDatabase();
 
                         if (!isValidationLogin(login.getText().toString(), database)) {
-
-
                             ContentValues contentValues = new ContentValues();
                             contentValues.put(TeacherDataBase.TeachersTable.TEACHER_NAME, surname.getText().toString() + " "
                                     + teacherName.getText().toString() + " " + middleName.getText().toString());
                             contentValues.put(TeacherDataBase.TeachersTable.LOGIN, login.getText().toString());
                             contentValues.put(TeacherDataBase.TeachersTable.PASSWORD, password.getText().toString());
-
-
-                            database.insert(TeacherDataBase.TeachersTable.TABLE_NAME, null, contentValues);
-                            database.close();
+                            long idTeacher = database.insert(TeacherDataBase.TeachersTable.TABLE_NAME, null, contentValues);
+                            Log.e("TAG", "id teacher " + String.valueOf(idTeacher));
+//                            getPreferences(MODE_PRIVATE);
+//                            SharedPreferences shares = getSharedPreferences(ID_ALL_TABLES, MODE_PRIVATE);
+//                            SharedPreferences.Editor editor =shares.edit();
+//                            editor.putLong(TeacherDataBase.TeachersTable.TABLE_NAME,idTeacher);
+//                            editor.commit();
                             Log.e("TAG", " add new teacher ");
                             Intent intent = new Intent(TeacherRegistration.this, NavigationDrawer.class);
+                            intent.putExtra(TeacherDataBase.TeachersTable.ID, idTeacher);
                             startActivity(intent);
+                            database.close();
                             finish();
                         } else {
                             login.validateWith(validatorLogin);
@@ -178,7 +177,6 @@ public class TeacherRegistration extends ActionBarActivity {
     }
 
     private void setSettingMaterialEditText(MaterialEditText text, String nextName) {
-
         text.setPrimaryColor(getResources().getColor(R.color.color_primary));
         text.setFloatingLabel(FLOAT_LABEL);
         text.setFloatingLabelText(nextName);

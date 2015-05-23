@@ -1,9 +1,10 @@
 package com.example.dima.teacherorganizer;
 
+
 import android.app.Activity;
-import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -13,8 +14,10 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.Toast;
 
-import com.example.dima.teacherorganizer.DataBase.TeacherDataBase;
-import com.example.dima.teacherorganizer.Fragment.TeachersFragment;
+import com.example.dima.teacherorganizer.Fragment.GroupsFragment;
+import com.example.dima.teacherorganizer.Fragment.SettingsFragment;
+import com.example.dima.teacherorganizer.Fragment.StudentsFragment;
+import com.example.dima.teacherorganizer.Fragment.SubjectsFragment;
 import com.mikepenz.iconics.typeface.FontAwesome;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.model.DividerDrawerItem;
@@ -24,35 +27,37 @@ import com.mikepenz.materialdrawer.model.interfaces.Badgeable;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.Nameable;
 
-
-public class NavigationDrawer extends ActionBarActivity implements TeachersFragment.OnFragmentInteractionListener {
+public class NavigationDrawer extends ActionBarActivity implements StudentsFragment.OnFragmentInteractionListener,
+        Drawer.OnDrawerItemClickListener, SettingsFragment.OnFragmentInteractionListener,GroupsFragment.OnFragmentInteractionListener,
+SubjectsFragment.OnFragmentInteractionListener{
 
     private Drawer.Result drawerResult = null;
     private final String TAG = "TAG";
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(Activity.RESULT_OK == resultCode){
-            Log.e(TAG, "onActivityResult OK");
-//            startActivity();
-        }
-        super.onActivityResult(requestCode, resultCode, data);
-    }
+    private static final int STUDENTS = 0;
+    private static final int GROUPS = 1;
+    private static final int SUBJECTS = 2;
+    private static final int SETTING = 4;
+    private static final int EXIT = 5;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Инициализируем Toolbar
-//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
-//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        /*
+Инициализируем Toolbar
+Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+setSupportActionBar(toolbar);
+*/
+        getSupportActionBar().setTitle(getResources().getString(R.string.students));
 
         // Инициализируем Navigation Drawer
         Drawer navigationDrawer = new Drawer();
 
-
+        android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction()
+                .replace(R.id.content_frame, new StudentsFragment())
+                .commit();
         navigationDrawer.withActivity(this);
 //        navigationDrawer.withToolbar(toolbar);
         navigationDrawer.withActionBarDrawerToggle(true);
@@ -94,30 +99,13 @@ public class NavigationDrawer extends ActionBarActivity implements TeachersFragm
             @Override
             public void onDrawerClosed(View drawerView) {
             }
-        });
-        navigationDrawer.withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+
             @Override
-            // Обработка клика
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id, IDrawerItem drawerItem) {
-                if (drawerItem instanceof Nameable) {
-                    Toast.makeText(NavigationDrawer.this, NavigationDrawer.this.getString(((Nameable) drawerItem).getNameRes()), Toast.LENGTH_SHORT).show();
-                }
-                if (drawerItem instanceof Badgeable) {
-                    Badgeable badgeable = (Badgeable) drawerItem;
-                    if (badgeable.getBadge() != null) {
-                        // учтите, не делайте так, если ваш бейдж содержит символ "+"
-                        try {
-                            int badge = Integer.valueOf(badgeable.getBadge());
-                            if (badge > 0) {
-                                drawerResult.updateBadge(String.valueOf(badge - 1), position);
-                            }
-                        } catch (Exception e) {
-                            Log.e("TAG", "Не нажимайте на бейдж, содержащий плюс! :)");
-                        }
-                    }
-                }
+            public void onDrawerSlide(View view, float v) {
+
             }
         });
+        navigationDrawer.withOnDrawerItemClickListener(this);
         navigationDrawer.withOnDrawerItemLongClickListener(new Drawer.OnDrawerItemLongClickListener() {
             @Override
             // Обработка длинного клика, например, только для SecondaryDrawerItem
@@ -145,19 +133,19 @@ public class NavigationDrawer extends ActionBarActivity implements TeachersFragm
     // Заглушка, работа с меню
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+//        getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
     // Заглушка, работа с меню
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
+//        int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
+//        if (id == R.id.action_settings) {
+//            return true;
+//        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -165,6 +153,83 @@ public class NavigationDrawer extends ActionBarActivity implements TeachersFragm
     @Override
     public void onFragmentInteraction(String id) {
 
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> adapterView, View view, int position, long l, IDrawerItem iDrawerItem) {
+        Fragment fragment = null;
+        switch (position) {
+            case STUDENTS:
+                fragment = new StudentsFragment();
+                onDrawTitleNameNavigationDrawer(position, fragment, iDrawerItem);
+                fragment = null;
+                break;
+            case GROUPS:
+                fragment = new GroupsFragment();
+                onDrawTitleNameNavigationDrawer(position, fragment, iDrawerItem);
+                fragment = null;
+
+                break;
+            case SUBJECTS:
+                fragment = new SubjectsFragment();
+                onDrawTitleNameNavigationDrawer(position, fragment, iDrawerItem);
+                fragment = null;
+
+                break;
+            case SETTING:
+                fragment= new SettingsFragment();
+                onDrawTitleNameNavigationDrawer(position, fragment, iDrawerItem);
+                fragment = null;
+                break;
+            case EXIT:
+                finish();
+                break;
+        }
+
+        // Insert the fragment by replacing any existing fragment
+
+
+    }
+
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+
+    }
+
+    @Override
+    public void onFragmentInteraction(int position) {
+
+    }
+    private void onDrawTitleNameNavigationDrawer(int position,Fragment fragment, IDrawerItem iDrawerItem){
+        Bundle args = new Bundle();
+        args.putInt("Position", position);
+        fragment.setArguments(args);
+        android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction()
+                .replace(R.id.content_frame, fragment)
+                .commit();
+
+        if (iDrawerItem instanceof Nameable) {
+
+            getSupportActionBar().setTitle(NavigationDrawer.this.getString(((Nameable) iDrawerItem).getNameRes()));
+            getSupportActionBar().setTitle(NavigationDrawer.this.getString(((Nameable) iDrawerItem).getNameRes()));
+            Toast.makeText(NavigationDrawer.this, NavigationDrawer.this.getString(((Nameable) iDrawerItem).getNameRes()),
+                    Toast.LENGTH_SHORT).show();
+        }
+        if (iDrawerItem instanceof Badgeable) {
+            Badgeable badgeable = (Badgeable) iDrawerItem;
+            if (badgeable.getBadge() != null) {
+                // учтите, не делайте так, если ваш бейдж содержит символ "+"
+                try {
+                    int badge = Integer.valueOf(badgeable.getBadge());
+                    if (badge > 0) {
+                        drawerResult.updateBadge(String.valueOf(badge+1), position);
+                    }
+                } catch (Exception e) {
+                    Log.e("TAG", "Не нажимайте на бейдж, содержащий плюс! :)");
+                }
+            }
+        }
     }
 }
 ///**

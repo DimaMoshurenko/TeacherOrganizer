@@ -7,6 +7,24 @@
     For more on layout aliases, see:
     http://developer.android.com/training/multiscreen/screensizes.html#TaskUseAliasFilters
     -->
-    <item name="fragment_teachers_item" type="layout">@layout/fragment_teachers_item_grid</item>
+    <item name="fragment_teachers_item" type="layout">@layout/fragment_students_item_grid</item>
+
+    <!--
+    Layout alias to replace the single-pane version of the layout with a
+    two-pane version on Large screens.
+
+    For more on layout aliases, see:
+    http://developer.android.com/training/multiscreen/screensizes.html#TaskUseAliasFilters
+    -->
+    <item name="fragment_groups_item" type="layout">@layout/fragment_groups_item_grid</item>
+
+    <!--
+    Layout alias to replace the single-pane version of the layout with a
+    two-pane version on Large screens.
+
+    For more on layout aliases, see:
+    http://developer.android.com/training/multiscreen/screensizes.html#TaskUseAliasFilters
+    -->
+    <item name="fragment_subjects_item" type="layout">@layout/fragment_subjects_item_grid</item>
 
 </resources>

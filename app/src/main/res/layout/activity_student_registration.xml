@@ -7,10 +7,10 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context="com.example.dima.teacherorganizer.StudentRegistration">
+    tools:context="com.example.dima.teacherorganizer.RegistrationActivity.StudentRegistration">
 
     <com.rengwuxian.materialedittext.MaterialEditText
-        android:id="@+id/surname"
+        android:id="@+id/new_surname_student"
 
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -21,44 +21,63 @@
         android:password="false" />
 
     <com.rengwuxian.materialedittext.MaterialEditText
-        android:id="@+id/name_teacher"
+        android:id="@+id/new_name_student"
 
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/name_teacher"
         app:met_floatingLabel="highlight"
         android:textColor="@color/color_primary"
-        android:layout_below="@+id/surname"
+        android:layout_below="@+id/new_surname_student"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:inputType="textCapSentences|textAutoCorrect" />
 
     <com.rengwuxian.materialedittext.MaterialEditText
-        android:id="@+id/middle_name"
+        android:id="@+id/new_middle_name_student"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/middle_name"
         android:textColor="@color/color_primary"
-        android:layout_below="@+id/name_teacher"
+        android:layout_below="@+id/new_name_student"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:inputType="textCapSentences|textAutoCorrect" />
 
     <com.rengwuxian.materialedittext.MaterialEditText
-        android:id="@+id/login"
+        android:id="@+id/new_phone_number_student"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/login"
-        android:inputType="textEmailAddress"
+        android:hint="@string/phone_number"
+        android:inputType="number"
         android:textColor="@color/color_primary"
-        android:layout_below="@+id/middle_name"
+        android:layout_below="@+id/new_middle_name_student"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
+
+    <com.rengwuxian.materialedittext.MaterialAutoCompleteTextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/student_group"
+        android:hint="@string/group"
+        android:layout_below="@+id/new_phone_number_student"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <com.rengwuxian.materialedittext.MaterialEditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/new_student_mail"
+        android:inputType="textEmailAddress"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:hint="@string/mail"
+        android:layout_below="@+id/student_group" />
 
     <com.gc.materialdesign.views.ButtonFlat
         android:layout_width="300dp"
         android:layout_height="70dp"
-        android:id="@+id/add_teacher"
+        android:id="@+id/add_student"
         android:text="@string/add_student"
         android:layout_alignWithParentIfMissing="false"
         android:layout_alignParentBottom="true"

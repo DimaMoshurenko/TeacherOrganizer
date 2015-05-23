@@ -4,17 +4,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.dima.teacherorganizer.Fragment.TeachersFragment">
+    tools:context="com.example.dima.teacherorganizer.Fragment.StudentsFragment">
 
     <GridView
-        android:id="@+id/list"
+        android:id="@+id/list_studets"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:numColumns="2" />
 
-
     <com.gc.materialdesign.views.ButtonFloat
-        android:id="@+id/float_button"
+        android:id="@+id/float_button_groups"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|right"
@@ -26,19 +25,4 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" />
-
-    <!--<ImageButton-->
-        <!--android:layout_width="56dp"-->
-        <!--android:layout_height="56dp"-->
-        <!--style="@style/ButtonFloatStyle"-->
-        <!--android:layout_alignParentBottom="true"-->
-        <!--android:layout_alignParentRight="true"-->
-        <!--android:layout_alignParentEnd="true"-->
-        <!--android:src="@drawable/add_button"-->
-        <!--android:layout_marginRight="15dp"-->
-        <!--android:layout_marginEnd="15dp"-->
-        <!--android:layout_marginBottom="15dp"-->
-        <!--android:id="@+id/float_button" />-->
-
-
 </RelativeLayout>

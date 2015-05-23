@@ -8,6 +8,10 @@
 
     <string name="subjects">Предметы</string>
     <string name="groups">Группы</string>
+    <string name="group">Группа</string>
+
+    <string name="mail">Почта</string>
+    <string name="group_not_repeat_error_message">Такая группа не существует!</string>
     <string name="students">Студенты</string>
     <string name="teachers">Учетеля</string>
     <string name="name_teacher">Имя</string>
@@ -15,13 +19,18 @@
     <string name="middle_name">Отчество</string>
     <string name="password">Пароль</string>
     <string name="login">Логин</string>
+    <string name="phone_number">Номер телефона</string>
     <string name="not_empty_warning">Поле не заполнено, заполните пожалуйста.</string>
     <string name="login_not_empty_warning">Введите Логин пожалуйста.</string>
     <string name="password_not_empty_warning">Введите пароль пожалуйста.</string>
     <string name="passwords_are_different">Пароли разные, проверьте введенные пароли.</string>
     <string name="login_are_different">Логин такой уже существует, введенные другой.</string>
 
-    <string name="passwords_login_incorrect">Проверте логин и пароль.</string>
+    <string name="passwords_login_incorrect">Проверте логин или пароль.</string>
+    <string name="add_group">Добавить групу </string>
+    <string name="name_group">Название групи </string>
+    <string name="name_kuratora">Кратор Ф.И.О. </string>
+    <string name="number_kuratora">Номер телефона Куратора</string>
 
     <string name="password_repeat">Повторите Пароль</string>
     <string name="sing">Войти</string>
@@ -42,7 +51,11 @@
     <string name="teacher_title">Учитель</string>
     <string name="title_activity_student_registration">Регистрация Студента</string>
 
-<string name="add_student">Добавить Студента</string>
-<string name="add_teacher">Добавить Учителя</string>
+    <string name="add_student">Добавить Студента</string>
+    <string name="add_teacher">Добавить Учителя</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_group_registration">GroupRegistration</string>
 
 </resources>

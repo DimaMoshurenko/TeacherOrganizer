@@ -19,7 +19,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".LoginActivity"
+            android:name=".RegistrationActivity.LoginActivity"
             android:label="@string/app_name"
             android:theme="@style/Navigation" >
             <intent-filter>
@@ -29,17 +29,21 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".TeacherRegistration"
+            android:name=".RegistrationActivity.TeacherRegistration"
             android:label="@string/teacher_title"
             android:theme="@style/AppTheme" >
         </activity>
         <activity
             android:name=".NavigationDrawer"
-            android:label="@string/teacher_title" >
+            android:label="" >
         </activity>
         <activity
-            android:name=".StudentRegistration"
+            android:name=".RegistrationActivity.StudentRegistration"
             android:label="@string/title_activity_student_registration" >
+        </activity>
+        <activity
+            android:name=".RegistrationActivity.GroupRegistration"
+            android:label="@string/title_activity_group_registration" >
         </activity>
     </application>
 

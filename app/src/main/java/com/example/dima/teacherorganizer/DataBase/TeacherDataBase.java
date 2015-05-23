@@ -20,6 +20,8 @@ public class TeacherDataBase extends SQLiteOpenHelper {
 
     private static final String CREATE_GROUPS_TABLE = "CREATE TABLE " + GroupsTable.TABLE_NAME +
             " ( " + GroupsTable.ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            GroupsTable.NAME_KURATOTA + " VARCHAR(100), " +
+            GroupsTable. NUMBER_KURATOTA+ " INTEGER, " +
             GroupsTable.GROUP_ + "  VARCHAR(100))";
 
     private static final String CREATE_LESSONS_TABLE = "CREATE TABLE " + LessonsTable.TABLE_NAME +
@@ -163,5 +165,7 @@ public class TeacherDataBase extends SQLiteOpenHelper {
 
         public static final String ID = BaseColumns._ID;
         public static final String GROUP_ = "groups";
+        public static final String NAME_KURATOTA = "name_kuratora";
+        public static final String NUMBER_KURATOTA = "number_kuratora";
     }
 }

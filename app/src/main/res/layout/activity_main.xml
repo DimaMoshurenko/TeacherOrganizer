@@ -5,37 +5,39 @@
     tools:context=".MainActivity">
 
     <!--<android.support.v7.widget.Toolbar-->
-        <!--android:id="@+id/toolbar"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:background="@color/color_primary"-->
-        <!--android:titleTextAppearance="@color/color_primary_light"-->
-        <!--android:elevation="4dp"-->
-        <!--android:minHeight="?attr/actionBarSize"-->
-        <!--android:paddingTop="2dp"-->
-        <!--android:transitionName="actionBar"-->
-        <!--app:theme="@style/Theme.AppCompat.Light.DarkActionBar" />-->
+    <!--android:id="@+id/toolbar"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:background="@color/color_primary"-->
+    <!--android:titleTextAppearance="@color/color_primary_light"-->
+    <!--android:elevation="4dp"-->
+    <!--android:minHeight="?attr/actionBarSize"-->
+    <!--android:paddingTop="2dp"-->
+    <!--android:transitionName="actionBar"-->
+    <!--app:theme="@style/Theme.AppCompat.Light.DarkActionBar" />-->
+
 
     <FrameLayout
+        android:id="@+id/content_frame"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        >
-        <!--android:layout_below="@+id/toolbar"-->
-        <!-- **** Place Your Content Here **** -->
+        android:layout_height="match_parent" />
+    <!--android:layout_below="@+id/toolbar"-->
+    <!-- **** Place Your Content Here **** -->
 
-        <!--<View-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="8dp"-->
-             <!--/>-->
-        <!--android:background="@drawable/toolbar_shadow"-->
-        <fragment
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/list_teachers"
-            android:name="com.example.dima.teacherorganizer.Fragment.TeachersFragment"
-            tools:layout="@layout/fragment_teachers_item" />
+    <!--<View-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="8dp"-->
+    <!--/>-->
+    <!--android:background="@drawable/toolbar_shadow"-->
 
-    </FrameLayout>
+    <!--<fragment-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:id="@+id/list_teachers"-->
+    <!--android:name="com.example.dima.teacherorganizer.Fragment.StudentsFragment"-->
+    <!--tools:layout="@layout/fragment_teachers_item" />-->
 
 
-</RelativeLayout>
+
+
+    </RelativeLayout>
