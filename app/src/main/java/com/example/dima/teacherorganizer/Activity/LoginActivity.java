@@ -1,4 +1,4 @@
-package com.example.dima.teacherorganizer.RegistrationActivity;
+package com.example.dima.teacherorganizer.Activity;
 
 import android.content.Intent;
 import android.database.Cursor;
@@ -11,6 +11,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.example.dima.teacherorganizer.DataBase.TeacherDataBase;
 import com.example.dima.teacherorganizer.NavigationDrawer;
@@ -18,12 +19,20 @@ import com.example.dima.teacherorganizer.R;
 import com.rengwuxian.materialedittext.MaterialEditText;
 import com.rengwuxian.materialedittext.validation.RegexpValidator;
 
-import static com.example.dima.teacherorganizer.RegistrationActivity.TeacherRegistration.setSettingMaterialEditText;
+import static com.example.dima.teacherorganizer.Activity.TeacherRegistration.setSettingMaterialEditText;
 
-import com.example.dima.teacherorganizer.RegistrationActivity.TeacherRegistration.NotEmptyValidator;
+import com.example.dima.teacherorganizer.Activity.TeacherRegistration.NotEmptyValidator;
 
 
 public class LoginActivity extends ActionBarActivity {
+private static String idTeacher;
+
+    public static String getIdTeacher() {
+        Log.e("TAG"," id teacher "+ idTeacher);
+        return idTeacher;
+    }
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,9 +68,24 @@ public class LoginActivity extends ActionBarActivity {
                         if (isValidationPassword(password.getText().toString(), login.getText().toString(), database)
                                 | password.getText().toString().equals("admin")) {
                             // добавить вход только в данный профель
-                            Intent intent = new Intent(LoginActivity.this, NavigationDrawer.class);
-                            startActivity(intent);
-                            finish();
+                            Cursor cursor = database.query(TeacherDataBase.TeachersTable.TABLE_NAME, new String[]{TeacherDataBase.TeachersTable.ID,
+                                            TeacherDataBase.TeachersTable.LOGIN}, TeacherDataBase.TeachersTable.LOGIN + " = ? ",
+                                    new String[]{login.getText().toString()}, null, null, null);
+                            if (cursor.moveToFirst()) {
+                                idTeacher = cursor.getString(cursor.getColumnIndex(TeacherDataBase.ThemeTable.ID));
+                                try {
+                                    if (idTeacher != null) {
+                                        Intent intent = new Intent(LoginActivity.this, NavigationDrawer.class);
+                                        startActivity(intent);
+                                        finish();
+                                    }
+                                } catch (Exception e) {
+                                    Toast.makeText(getApplication(), " Не вышло зайти в учетную запись ", Toast.LENGTH_LONG).show();
+                                }
+                            }else {
+                                Toast.makeText(getApplication(), " Не вышло зайти в учетную запись ", Toast.LENGTH_LONG).show();
+                            }
+
                         } else {
                             login.validateWith(validatorLogin);
                             password.validateWith(validatorLogin);
@@ -116,7 +140,7 @@ public class LoginActivity extends ActionBarActivity {
                 }
             } while (cursor.moveToNext());
         }
-
+        cursor.close();
         return result;
     }
 }

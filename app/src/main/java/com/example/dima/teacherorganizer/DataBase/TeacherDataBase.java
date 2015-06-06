@@ -21,7 +21,8 @@ public class TeacherDataBase extends SQLiteOpenHelper {
     private static final String CREATE_GROUPS_TABLE = "CREATE TABLE " + GroupsTable.TABLE_NAME +
             " ( " + GroupsTable.ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             GroupsTable.NAME_KURATOTA + " VARCHAR(100), " +
-            GroupsTable. NUMBER_KURATOTA+ " INTEGER, " +
+            GroupsTable.ID_TEACHER + " INTEGER, " +
+            GroupsTable.NUMBER_KURATOTA + " VARCHAR(100), " +
             GroupsTable.GROUP_ + "  VARCHAR(100))";
 
     private static final String CREATE_LESSONS_TABLE = "CREATE TABLE " + LessonsTable.TABLE_NAME +
@@ -35,16 +36,18 @@ public class TeacherDataBase extends SQLiteOpenHelper {
     private static final String CREATE_STUDENT_TABLE = "CREATE TABLE " + StudentTable.TABLE_NAME +
             " ( " + StudentTable.ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             StudentTable.STUDENT_NAME + " VARCHAR(300), " +
-            StudentTable.TELEPHONE_NUMBER +  " VARCHAR(15), "+
-            StudentTable.STUDENT_MAIL +  " VARCHAR(100), "+
-            StudentTable._ID_GROUP + " INTEGER )";
+            StudentTable.TELEPHONE_NUMBER + " VARCHAR(15), " +
+            StudentTable.STUDENT_MAIL + " VARCHAR(100), " +
+            StudentTable._ID_GROUP + " INTEGER, "+
+            StudentTable._ID_TEACHER + " INTEGER )";
 
     private static final String CREATE_TEACHER_SUBJECT_TABLE = "CREATE TABLE " + TeacherSubjectTable.TABLE_NAME +
             " ( " + TeacherSubjectTable.ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             TeacherSubjectTable.SUBJECT_ID + " INTEGER, " +
+            TeacherSubjectTable.GROUP_ID + " INTEGER, " +
             TeacherSubjectTable.TEACHER_ID + " INTEGER )";
 
-    private static final String CREATE_DATE_TABLE = "CREATE TABLE " + ThemeTable.TABLE_NAME +
+    private static final String CREATE_THEME_TABLE = "CREATE TABLE " + ThemeTable.TABLE_NAME +
             " ( " + ThemeTable.ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             ThemeTable.ID_SUBJECT + " INTEGER, " +
             ThemeTable.TITLE + "  VARCHAR(250), " +
@@ -52,17 +55,9 @@ public class TeacherDataBase extends SQLiteOpenHelper {
 
     private static final String CREATE_SUBJECTS_TABLE = "CREATE TABLE " + SubjectsTable.TABLE_NAME +
             " ( " + SubjectsTable.ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            SubjectsTable.NUMBER_SUBJECT + " VARCHAR(10), " +
+            SubjectsTable.ID_TEACHER + " INTEGER, " +
             SubjectsTable.SUBJECT + " VARCHAR(250) )";
-
-    public class GradesTable {
-        public static final String TABLE_NAME = "GradesTable";
-
-        public static final String ID = BaseColumns._ID;
-        public static final String ID_STUDENT = "_id_student";
-        public static final String ID_LESSON = "_id_lesson";
-
-        public static final String MARKS = "grades";
-    }
 
     private static final String CREATE_GRADES_TABLE = "CREATE TABLE " + GradesTable.TABLE_NAME +
             " ( " + GradesTable.ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -70,11 +65,14 @@ public class TeacherDataBase extends SQLiteOpenHelper {
             GradesTable.ID_STUDENT + " INTEGER, " +
             GradesTable.MARKS + " INTEGER ) ";
 
+
+
     public TeacherDataBase(Context context) {
 
         super(context, DB_NAME, null, VERSION);
 
     }
+
 
     @Override
     public void onCreate(SQLiteDatabase db) {
@@ -85,7 +83,7 @@ public class TeacherDataBase extends SQLiteOpenHelper {
         db.execSQL(CREATE_SUBJECTS_TABLE);
         db.execSQL(CREATE_TEACHER_SUBJECT_TABLE);
         db.execSQL(CREATE_TEACHERS_TABLE);
-        db.execSQL(CREATE_DATE_TABLE);
+        db.execSQL(CREATE_THEME_TABLE);
         Log.e("TAG", "onCreate DB");
     }
 
@@ -106,6 +104,15 @@ public class TeacherDataBase extends SQLiteOpenHelper {
         }
     }
 
+    public class GradesTable {
+        public static final String TABLE_NAME = "GradesTable";
+
+        public static final String ID = BaseColumns._ID;
+        public static final String ID_STUDENT = "_id_student";
+        public static final String ID_LESSON = "_id_lesson";
+        public static final String MARKS = "grades";
+    }
+
     public class TeachersTable {
         public static final String TABLE_NAME = "TeachersTable";
 
@@ -121,6 +128,7 @@ public class TeacherDataBase extends SQLiteOpenHelper {
         public static final String ID = BaseColumns._ID;
         public static final String TITLE = "title";
         public static final String ID_SUBJECT = "_id_subject";
+//        public static final String ID_GROUP = "_id_grups";
 
         public static final String NUM_PP = "num_pp";
     }
@@ -129,6 +137,7 @@ public class TeacherDataBase extends SQLiteOpenHelper {
         public static final String TABLE_NAME = "TeacherSubjectsTable";
         public static final String ID = BaseColumns._ID;
         public static final String TEACHER_ID = "teacher_id";
+        public static final String GROUP_ID = "group_id";
         public static final String SUBJECT_ID = "subject_id";
     }
 
@@ -137,6 +146,8 @@ public class TeacherDataBase extends SQLiteOpenHelper {
 
         public static final String ID = BaseColumns._ID;
         public static final String SUBJECT = "subject";
+        public static final String ID_TEACHER = "id_teacher";
+        public static final String NUMBER_SUBJECT = "number_subject";
     }
 
     public class StudentTable {
@@ -146,8 +157,9 @@ public class TeacherDataBase extends SQLiteOpenHelper {
         public static final String STUDENT_NAME = "Student_Name";
         public static final String STUDENT_MAIL = "Mail";
 
-        public static final String  TELEPHONE_NUMBER ="telephone_number";
+        public static final String TELEPHONE_NUMBER = "telephone_number";
         public static final String _ID_GROUP = "_id_Group";
+        public static final String _ID_TEACHER = "_id_Teacher";
     }
 
     public class LessonsTable {
@@ -160,11 +172,13 @@ public class TeacherDataBase extends SQLiteOpenHelper {
         public static final String _ID_TEACHER = "_id_teacher";
     }
 
+
     public class GroupsTable {
         public static final String TABLE_NAME = "GroupsTable";
 
         public static final String ID = BaseColumns._ID;
         public static final String GROUP_ = "groups";
+        public static final String ID_TEACHER = "id_teacher";
         public static final String NAME_KURATOTA = "name_kuratora";
         public static final String NUMBER_KURATOTA = "number_kuratora";
     }

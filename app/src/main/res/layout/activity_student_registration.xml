@@ -7,7 +7,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context="com.example.dima.teacherorganizer.RegistrationActivity.StudentRegistration">
+    tools:context="com.example.dima.teacherorganizer.Activity.StudentRegistration">
 
     <com.rengwuxian.materialedittext.MaterialEditText
         android:id="@+id/new_surname_student"
@@ -25,7 +25,7 @@
 
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/name_teacher"
+        android:hint="@string/name"
         app:met_floatingLabel="highlight"
         android:textColor="@color/color_primary"
         android:layout_below="@+id/new_surname_student"

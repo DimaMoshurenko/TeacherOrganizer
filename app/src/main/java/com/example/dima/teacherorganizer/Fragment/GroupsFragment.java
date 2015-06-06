@@ -7,18 +7,21 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.SimpleCursorAdapter;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.GridView;
 import android.widget.ListView;
 
+import com.example.dima.teacherorganizer.Activity.LoginActivity;
+import com.example.dima.teacherorganizer.Activity.TableActivity;
 import com.example.dima.teacherorganizer.DataBase.TeacherDataBase;
-import com.example.dima.teacherorganizer.RegistrationActivity.GroupRegistration;
+import com.example.dima.teacherorganizer.Activity.GroupRegistration;
 import com.example.dima.teacherorganizer.R;
 import com.gc.materialdesign.views.ButtonFloat;
 
@@ -27,7 +30,7 @@ public class GroupsFragment extends Fragment implements AbsListView.OnItemClickL
     private OnFragmentInteractionListener mListener;
 
     private ListView mListView;
-    private GridView mGridView;
+//    private GridView mGridView;
     private String[] from;
 
 
@@ -35,6 +38,7 @@ public class GroupsFragment extends Fragment implements AbsListView.OnItemClickL
     private int[] to;
     private SQLiteDatabase database;
     private ButtonFloat addGroup;
+    private Cursor cursor;
 
 
     public GroupsFragment() {
@@ -51,11 +55,12 @@ public class GroupsFragment extends Fragment implements AbsListView.OnItemClickL
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_groups_item, container, false);
 
-        from = new String[]{TeacherDataBase.StudentTable.STUDENT_NAME};
-        to = new int[]{R.id.name_student_list};
+        from = new String[]{TeacherDataBase.GroupsTable.GROUP_};
+        to = new int[]{R.id.other_name};
         // Set the adapter
         mListView = (ListView) view.findViewById(R.id.list_groups);
         addGroup = (ButtonFloat) view.findViewById(R.id.float_button_groups);
+//        getActivity().getSupportLoaderManager().initLoader(0, null, this);
         // Set OnItemClickListener so we can be notified on item clicks
         return view;
     }
@@ -64,10 +69,10 @@ public class GroupsFragment extends Fragment implements AbsListView.OnItemClickL
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mListView.setOnItemClickListener(this);
-        database = new TeacherDataBase(getActivity()).getWritableDatabase();
-        Cursor cursor = database.query(TeacherDataBase.StudentTable.TABLE_NAME,
-                new String[]{TeacherDataBase.TeachersTable.ID, TeacherDataBase.StudentTable.STUDENT_NAME},
-                null, null, null, null, null);
+        database = new TeacherDataBase(getActivity()).getReadableDatabase();
+        cursor = database.query(TeacherDataBase.GroupsTable.TABLE_NAME,
+                        new String[]{TeacherDataBase.GroupsTable.ID, TeacherDataBase.GroupsTable.GROUP_},
+                TeacherDataBase.GroupsTable.ID_TEACHER + " = ? ", new String[]{LoginActivity.getIdTeacher()}, null, null, null, null);
 
         mAdapter = new SimpleCursorAdapter(getActivity(), R.layout.item_list_fragment, cursor, from, to,0);
         mListView.setAdapter(mAdapter);
@@ -102,13 +107,16 @@ public class GroupsFragment extends Fragment implements AbsListView.OnItemClickL
         if (null != mListener) {
             // Notify the active callbacks interface (the activity, if the
             // fragment is attached to one) that an item has been selected.
+
+            Log.e("Tag", "position "+String.valueOf(position)+" id "+String.valueOf(id));
             mListener.onFragmentInteraction(position);
         }
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return null;
+        String[] projection = {TeacherDataBase.GroupsTable.GROUP_};
+        return new CursorLoader(getActivity(), null, projection, null, null, null);
     }
 
     @Override
@@ -126,6 +134,7 @@ public class GroupsFragment extends Fragment implements AbsListView.OnItemClickL
             mAdapter.swapCursor(data);
 //            mAdapter.swapCursor(data);
         }
+        loader.notify();
     }
 
     @Override

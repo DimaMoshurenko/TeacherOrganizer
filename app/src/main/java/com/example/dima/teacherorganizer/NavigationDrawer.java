@@ -14,6 +14,8 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.Toast;
 
+import com.example.dima.teacherorganizer.Activity.LoginActivity;
+import com.example.dima.teacherorganizer.DataBase.TeacherDataBase;
 import com.example.dima.teacherorganizer.Fragment.GroupsFragment;
 import com.example.dima.teacherorganizer.Fragment.SettingsFragment;
 import com.example.dima.teacherorganizer.Fragment.StudentsFragment;
@@ -28,51 +30,52 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.Nameable;
 
 public class NavigationDrawer extends ActionBarActivity implements StudentsFragment.OnFragmentInteractionListener,
-        Drawer.OnDrawerItemClickListener, SettingsFragment.OnFragmentInteractionListener,GroupsFragment.OnFragmentInteractionListener,
-SubjectsFragment.OnFragmentInteractionListener{
+        Drawer.OnDrawerItemClickListener, SettingsFragment.OnFragmentInteractionListener, GroupsFragment.OnFragmentInteractionListener,
+        SubjectsFragment.OnFragmentInteractionListener {
 
     private Drawer.Result drawerResult = null;
     private final String TAG = "TAG";
-    private static final int STUDENTS = 0;
-    private static final int GROUPS = 1;
-    private static final int SUBJECTS = 2;
+    private static final int GROUPS = 0;
+    private static final int SUBJECTS = 1;
+    private static final int STUDENTS = 2;
     private static final int SETTING = 4;
     private static final int EXIT = 5;
+    private String idTeacher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        idTeacher = LoginActivity.getIdTeacher();
         /*
 Инициализируем Toolbar
 Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 setSupportActionBar(toolbar);
 */
-        getSupportActionBar().setTitle(getResources().getString(R.string.students));
+//        getSupportActionBar().setTitle(getResources().getString(R.string.students));
 
         // Инициализируем Navigation Drawer
         Drawer navigationDrawer = new Drawer();
 
         android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
-                .replace(R.id.content_frame, new StudentsFragment())
+                .replace(R.id.content_frame, new GroupsFragment())
                 .commit();
         navigationDrawer.withActivity(this);
 //        navigationDrawer.withToolbar(toolbar);
         navigationDrawer.withActionBarDrawerToggle(true);
         navigationDrawer.withHeader(R.layout.drawer_image);
         navigationDrawer.addDrawerItems(
-                new PrimaryDrawerItem().withName(R.string.students)
-                        .withIcon(getResources().getDrawable(R.drawable.ic_account_multiple_black_24dp)),
 
 //                new PrimaryDrawerItem().withName(R.string.teachers)
 //                        .withIcon(FontAwesome.Icon.faw_user),
 
                 new PrimaryDrawerItem().withName(R.string.groups)
-                        .withIcon(FontAwesome.Icon.faw_group),
+        .withIcon(FontAwesome.Icon.faw_group),
                 new PrimaryDrawerItem().withName(R.string.subjects)
-                        .withIcon(FontAwesome.Icon.faw_book),
+        .withIcon(FontAwesome.Icon.faw_book),
+                new PrimaryDrawerItem().withName(R.string.students)
+                        .withIcon(getResources().getDrawable(R.drawable.ic_account_multiple_black_24dp)),
                 new DividerDrawerItem(),
                 new SecondaryDrawerItem().withName(R.string.settings)
                         .withIcon(FontAwesome.Icon.faw_cog),
@@ -157,29 +160,23 @@ setSupportActionBar(toolbar);
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long l, IDrawerItem iDrawerItem) {
-        Fragment fragment = null;
+        Fragment fragment;
         switch (position) {
             case STUDENTS:
                 fragment = new StudentsFragment();
                 onDrawTitleNameNavigationDrawer(position, fragment, iDrawerItem);
-                fragment = null;
                 break;
             case GROUPS:
                 fragment = new GroupsFragment();
                 onDrawTitleNameNavigationDrawer(position, fragment, iDrawerItem);
-                fragment = null;
-
                 break;
             case SUBJECTS:
                 fragment = new SubjectsFragment();
                 onDrawTitleNameNavigationDrawer(position, fragment, iDrawerItem);
-                fragment = null;
-
                 break;
             case SETTING:
-                fragment= new SettingsFragment();
+                fragment = new SettingsFragment();
                 onDrawTitleNameNavigationDrawer(position, fragment, iDrawerItem);
-                fragment = null;
                 break;
             case EXIT:
                 finish();
@@ -187,8 +184,6 @@ setSupportActionBar(toolbar);
         }
 
         // Insert the fragment by replacing any existing fragment
-
-
     }
 
     @Override
@@ -200,9 +195,11 @@ setSupportActionBar(toolbar);
     public void onFragmentInteraction(int position) {
 
     }
-    private void onDrawTitleNameNavigationDrawer(int position,Fragment fragment, IDrawerItem iDrawerItem){
+
+    private void onDrawTitleNameNavigationDrawer(int position, Fragment fragment, IDrawerItem iDrawerItem) {
         Bundle args = new Bundle();
         args.putInt("Position", position);
+
         fragment.setArguments(args);
         android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
@@ -223,7 +220,7 @@ setSupportActionBar(toolbar);
                 try {
                     int badge = Integer.valueOf(badgeable.getBadge());
                     if (badge > 0) {
-                        drawerResult.updateBadge(String.valueOf(badge+1), position);
+                        drawerResult.updateBadge(String.valueOf(badge + 1), position);
                     }
                 } catch (Exception e) {
                     Log.e("TAG", "Не нажимайте на бейдж, содержащий плюс! :)");
@@ -232,6 +229,7 @@ setSupportActionBar(toolbar);
         }
     }
 }
+
 ///**
 //     * A placeholder fragment containing a simple view.
 //     */

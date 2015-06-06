@@ -4,7 +4,13 @@
     tools:context="com.example.dima.teacherorganizer.Fragment.SettingsFragment">
 
     <!-- TODO: Update blank fragment layout -->
-    <TextView android:layout_width="match_parent" android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
 
+    <com.gc.materialdesign.views.ButtonFlat
+        android:layout_width="300dp"
+        android:layout_height="70dp"
+        android:id="@+id/cleacr_db"
+        android:text="Чистка всей базы данных "
+        android:layout_alignWithParentIfMissing="false"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true" />
 </FrameLayout>

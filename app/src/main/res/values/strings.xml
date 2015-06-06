@@ -8,15 +8,23 @@
 
     <string name="subjects">Предметы</string>
     <string name="groups">Группы</string>
+    <string name="groups_learning">Группы в которых читают этот предмет </string>
     <string name="group">Группа</string>
 
     <string name="mail">Почта</string>
+    <string name="new_subject"> Названия предмета </string>
+    <string name="number_subject"> Номер предмета </string>
+    <string name="add_subject"> Добавить предмет </string>
+
+
     <string name="group_not_repeat_error_message">Такая группа не существует!</string>
     <string name="students">Студенты</string>
     <string name="teachers">Учетеля</string>
-    <string name="name_teacher">Имя</string>
+
+    <string name="name">Имя</string>
     <string name="surname">Фамилия</string>
     <string name="middle_name">Отчество</string>
+
     <string name="password">Пароль</string>
     <string name="login">Логин</string>
     <string name="phone_number">Номер телефона</string>
@@ -57,5 +65,8 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_group_registration">GroupRegistration</string>
+    <string name="title_activity_subject_registration">SubjectRegistration</string>
+    <string name="title_activity_table">TableActivity</string>
+    <string name="title_activity_subjects_teacher">SubjectsTeacherActivity</string>
 
 </resources>

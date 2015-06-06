@@ -10,6 +10,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.SimpleCursorAdapter;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -19,10 +20,14 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
+import com.example.dima.teacherorganizer.Activity.LoginActivity;
+import com.example.dima.teacherorganizer.Activity.SubjectRegistration;
+import com.example.dima.teacherorganizer.Activity.SubjectsTeacherActivity;
 import com.example.dima.teacherorganizer.DataBase.TeacherDataBase;
 import com.example.dima.teacherorganizer.R;
-import com.example.dima.teacherorganizer.RegistrationActivity.StudentRegistration;
+import com.example.dima.teacherorganizer.Activity.StudentRegistration;
 import com.gc.materialdesign.views.ButtonFloat;
 
 public class StudentsFragment extends Fragment implements AbsListView.OnItemClickListener,
@@ -35,7 +40,7 @@ public class StudentsFragment extends Fragment implements AbsListView.OnItemClic
     private int[] to;
     private String[] from;
     private ButtonFloat addTeacher;
-    private String idTeacher;
+//    private String idTeacher;
 
     // TODO: Rename and change types of parameters
     public StudentsFragment() {
@@ -62,14 +67,21 @@ public class StudentsFragment extends Fragment implements AbsListView.OnItemClic
             case R.id.action_settings:
                 return true;
             case R.id.delete_db:
-                database.delete(TeacherDataBase.TeachersTable.TABLE_NAME, null, null);
+                TeacherDataBase db = new TeacherDataBase(getActivity());
+                database = db.getWritableDatabase();
+
                 database.delete(TeacherDataBase.SubjectsTable.TABLE_NAME, null, null);
                 database.delete(TeacherDataBase.GroupsTable.TABLE_NAME, null, null);
                 database.delete(TeacherDataBase.LessonsTable.TABLE_NAME, null, null);
                 database.delete(TeacherDataBase.GradesTable.TABLE_NAME, null, null);
                 database.delete(TeacherDataBase.TeacherSubjectTable.TABLE_NAME, null, null);
                 database.delete(TeacherDataBase.ThemeTable.TABLE_NAME, null, null);
+                database.delete(TeacherDataBase.TeachersTable.TABLE_NAME, null, null);
                 database.delete(TeacherDataBase.StudentTable.TABLE_NAME, null, null);
+
+                Log.e("TAg", " clearn "+LoginActivity.getIdTeacher());
+                Intent intent = new Intent(getActivity(),LoginActivity.class);
+                startActivity(intent);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -95,13 +107,10 @@ public class StudentsFragment extends Fragment implements AbsListView.OnItemClic
 //        Cursor cursor = database.query(TeacherDataBase.TeachersTable.TABLE_NAME,
 //                null, null, null, null, null,null);
 
-
-
         from = new String[]{TeacherDataBase.StudentTable.STUDENT_NAME};
-        to = new int[]{R.id.name_student_list};
+        to = new int[]{R.id.other_name};
 
         mListView = (ListView) view.findViewById(R.id.list_studets);
-
 
 
         return view;
@@ -112,12 +121,15 @@ public class StudentsFragment extends Fragment implements AbsListView.OnItemClic
         super.onViewCreated(view, savedInstanceState);
 
         database = new TeacherDataBase(getActivity()).getWritableDatabase();
-        Cursor cursor = database.query(TeacherDataBase.StudentTable.TABLE_NAME,
-                new String[]{TeacherDataBase.TeachersTable.ID, TeacherDataBase.StudentTable.STUDENT_NAME},
-                null, null, null, null, null);
-        idTeacher = getActivity().getIntent().getStringExtra(TeacherDataBase.TeachersTable.ID);
-        mAdapter = new SimpleCursorAdapter(getActivity(), R.layout.item_list_fragment, cursor, from, to, 0);
-        mListView.setAdapter(mAdapter);
+        if(LoginActivity.getIdTeacher()!=null) {
+            Cursor cursor = database.query(TeacherDataBase.StudentTable.TABLE_NAME,
+                    new String[]{TeacherDataBase.StudentTable.ID, TeacherDataBase.StudentTable.STUDENT_NAME},
+                    TeacherDataBase.StudentTable._ID_TEACHER + " = ? ", new String[]{LoginActivity.getIdTeacher()}, null, null, null);
+            mAdapter = new SimpleCursorAdapter(getActivity(), R.layout.item_list_fragment, cursor, from, to, 0);
+            mListView.setAdapter(mAdapter);
+        }
+
+
         // Set OnItemClickListener so we can be notified on item clicks
         mListView.setOnItemClickListener(this);
         addTeacher = (ButtonFloat) view.findViewById(R.id.float_button_groups);
@@ -125,8 +137,19 @@ public class StudentsFragment extends Fragment implements AbsListView.OnItemClic
         addTeacher.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent myIntent = new Intent(getActivity(), StudentRegistration.class);
-                startActivityForResult(myIntent, 0);
+                Cursor cursor = database.query(TeacherDataBase.SubjectsTable.TABLE_NAME,
+                        new String[]{TeacherDataBase.SubjectsTable.ID,TeacherDataBase.SubjectsTable.ID_TEACHER},
+                        TeacherDataBase.SubjectsTable.ID_TEACHER + " = ? ", new String[]{LoginActivity.getIdTeacher()}, null, null, null, null);
+                cursor.moveToLast();
+//                Log.e("TAG", "  cursor " + !cursor.isNull(cursor.getColumnIndex(TeacherDataBase.SubjectsTable.ID)));
+                if(LoginActivity.getIdTeacher()!=null&&cursor.getCount()>0) {
+                    Intent myIntent = new Intent(getActivity(), StudentRegistration.class);
+                    startActivityForResult(myIntent, 0);
+                }else{
+                    Toast.makeText(getActivity(), "Добавте сначала предмет прежде чем добавить Сдентов !", Toast.LENGTH_SHORT).show();
+                }
+
+
             }
         });
     }

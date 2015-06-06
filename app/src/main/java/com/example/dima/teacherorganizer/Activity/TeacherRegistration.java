@@ -1,4 +1,4 @@
-package com.example.dima.teacherorganizer.RegistrationActivity;
+package com.example.dima.teacherorganizer.Activity;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -23,9 +23,8 @@ import com.rengwuxian.materialedittext.validation.RegexpValidator;
 
 
 public class TeacherRegistration extends ActionBarActivity {
-    private static final int FLOAT_LABEL_TEXT_SIZE = 20;
-    private static final int FLOAT_LABEL = 2;
-    public static final String ID_ALL_TABLES = "id all tables";
+    public static final int FLOAT_LABEL_TEXT_SIZE = 20;
+    public static final int FLOAT_LABEL = 2;
     private SQLiteDatabase database;
     private ButtonFlat addTeacher;
 
@@ -33,13 +32,11 @@ public class TeacherRegistration extends ActionBarActivity {
 
         public NotEmptyValidator(String errorMessage) {
             super(errorMessage);
-
         }
 
         @Override
         public boolean isValid(CharSequence charSequence, boolean b) {
             return !TextUtils.isEmpty(charSequence);
-
         }
     }
 
@@ -49,7 +46,7 @@ public class TeacherRegistration extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registration_teacher);
         final MaterialEditText teacherName = (MaterialEditText) findViewById(R.id.new_name_student);
-        setSettingMaterialEditText(teacherName, getResources().getString(R.string.name_teacher));
+        setSettingMaterialEditText(teacherName, getResources().getString(R.string.name));
 
         final MaterialEditText surname = (MaterialEditText) findViewById(R.id.surname);
         setSettingMaterialEditText(surname, getResources().getString(R.string.surname));
@@ -107,7 +104,7 @@ public class TeacherRegistration extends ActionBarActivity {
 //                            editor.putLong(TeacherDataBase.TeachersTable.TABLE_NAME,idTeacher);
 //                            editor.commit();
                             Log.e("TAG", " add new teacher ");
-                            Intent intent = new Intent(TeacherRegistration.this, NavigationDrawer.class);
+                            Intent intent = new Intent(TeacherRegistration.this, LoginActivity.class);
                             intent.putExtra(TeacherDataBase.TeachersTable.ID, idTeacher);
                             startActivity(intent);
                             database.close();

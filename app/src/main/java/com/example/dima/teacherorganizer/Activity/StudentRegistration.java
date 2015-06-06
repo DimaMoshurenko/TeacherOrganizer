@@ -1,4 +1,4 @@
-package com.example.dima.teacherorganizer.RegistrationActivity;
+package com.example.dima.teacherorganizer.Activity;
 
 import android.annotation.TargetApi;
 import android.content.ContentValues;
@@ -10,6 +10,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,29 +26,48 @@ import com.rengwuxian.materialedittext.MaterialEditText;
 import com.rengwuxian.materialedittext.validation.RegexpValidator;
 
 import java.util.ArrayList;
+import java.util.Collections;
+
+import static com.example.dima.teacherorganizer.Activity.TeacherRegistration.setSettingMaterialEditText;
 
 
 public class StudentRegistration extends ActionBarActivity implements TextWatcher {
     private SQLiteDatabase database;
     private ArrayAdapter<String> adapter;
     ArrayList<String> listGroups;
+    private MaterialAutoCompleteTextView group;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_student_registration);
 
-
-        adapter = new ArrayAdapter<String>(getApplication(), R.layout.item_groups, R.id.group_auto_complete);
+        listGroups = new ArrayList<>();
+//        adapter = new ArrayAdapter<>(getApplication(), R.layout.item_groups, R.id.group_auto_complete);
         final MaterialEditText name = (MaterialEditText) findViewById(R.id.new_name_student);
         final MaterialEditText middleName = (MaterialEditText) findViewById(R.id.new_middle_name_student);
         final MaterialEditText surname = (MaterialEditText) findViewById(R.id.new_surname_student);
         final MaterialEditText mail = (MaterialEditText) findViewById(R.id.new_student_mail);
-        final MaterialAutoCompleteTextView group = (MaterialAutoCompleteTextView) findViewById(R.id.student_group);
-        group.addTextChangedListener(this);
         final MaterialEditText phoneNumber = (MaterialEditText) findViewById(R.id.new_phone_number_student);
+
+        group = (MaterialAutoCompleteTextView) findViewById(R.id.student_group);
         ButtonFlat buttonFloat = (ButtonFlat) findViewById(R.id.add_student);
 
+        setSettingMaterialEditText(name, getString(R.string.name), StudentRegistration.this);
+        setSettingMaterialEditText(middleName, getString(R.string.middle_name), StudentRegistration.this);
+        setSettingMaterialEditText(surname, getString(R.string.surname), StudentRegistration.this);
+        setSettingMaterialEditText(mail, getString(R.string.mail), StudentRegistration.this);
+        setSettingMaterialEditText(phoneNumber, getString(R.string.phone_number), StudentRegistration.this);
+
+        group.setPrimaryColor(getResources().getColor(R.color.color_primary_dark));
+        group.setUnderlineColor(getResources().getColor(R.color.color_primary_dark));
+        group.setFloatingLabel(TeacherRegistration.FLOAT_LABEL);
+        group.setFloatingLabelText(getString(R.string.group));
+        group.setFloatingLabelTextSize(TeacherRegistration.FLOAT_LABEL_TEXT_SIZE);
+
+        group.addTextChangedListener(this);
+        TeacherDataBase db = new TeacherDataBase(StudentRegistration.this);
+        database = db.getWritableDatabase();
         buttonFloat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -92,15 +112,14 @@ public class StudentRegistration extends ActionBarActivity implements TextWatche
                             if (idGroup != null) {
                                 try {
                                     content.put(TeacherDataBase.StudentTable._ID_GROUP, idGroup);
-                                    TeacherDataBase db = new TeacherDataBase(StudentRegistration.this);
-                                    database = db.getWritableDatabase();
-                                    long idStudent = database.insert(TeacherDataBase.StudentTable.TABLE_NAME, null, content);
+                                    content.put(TeacherDataBase.StudentTable._ID_TEACHER, LoginActivity.getIdTeacher());
+                                    database.insert(TeacherDataBase.StudentTable.TABLE_NAME, null, content);
+                                    Log.e("TAG","studetn registration "+ idGroup);
                                     Intent intent = new Intent(StudentRegistration.this, NavigationDrawer.class);
-                                    intent.putExtra(TeacherDataBase.StudentTable.ID, idStudent);
                                     startActivity(intent);
                                     database.close();
                                     finish();
-                                }catch (Exception e){
+                                } catch (Exception e) {
                                     Toast.makeText(getApplication(), " Не вышло добавить студента попробуйте еще раз ", Toast.LENGTH_LONG).show();
                                 }
                             } else {
@@ -112,7 +131,6 @@ public class StudentRegistration extends ActionBarActivity implements TextWatche
                         }
                     }
                 }
-
             }
         });
     }
@@ -144,7 +162,8 @@ public class StudentRegistration extends ActionBarActivity implements TextWatche
 
     }
 
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+
+
     @Override
     public void onTextChanged(CharSequence s, int start, int before, int count) {
 
@@ -152,15 +171,33 @@ public class StudentRegistration extends ActionBarActivity implements TextWatche
                 new String[]{TeacherDataBase.GroupsTable.ID, TeacherDataBase.GroupsTable.GROUP_},
                 null, null, null, null, null);
 
+        int repetition = 0;
         if (cursor.moveToFirst()) {
             do {
-                listGroups.add(cursor.getString(cursor.getColumnIndex(TeacherDataBase.GroupsTable.GROUP_)));
+                if (cursor.getString(cursor.getColumnIndex(TeacherDataBase.GroupsTable.GROUP_)) != null) {
 
+
+                    if (listGroups.size() > 0) {
+                        for (int c = 0; c < listGroups.size(); c++) {
+                            if (cursor.getString(cursor.getColumnIndex(TeacherDataBase.GroupsTable.GROUP_)).equals(listGroups.get(c))) {
+                                repetition++;
+                            }
+                        }
+                        if (repetition == 0) {
+                            listGroups.add(cursor.getString(cursor.getColumnIndex(TeacherDataBase.GroupsTable.GROUP_)));
+                        }
+                    } else {
+                        listGroups.add(cursor.getString(cursor.getColumnIndex(TeacherDataBase.GroupsTable.GROUP_)));
+                    }
+
+
+                }
             } while (cursor.moveToNext());
         }
-        if (listGroups != null) {
-            adapter.addAll(listGroups);
-        }
+        Collections.sort(listGroups);
+        adapter = new ArrayAdapter<>(StudentRegistration.this, R.layout.item_groups, R.id.group_auto_complete, listGroups);
+        group.setAdapter(adapter);
+        cursor.close();
     }
 
     @Override
