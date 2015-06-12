@@ -28,7 +28,7 @@ public class TeacherDataBase extends SQLiteOpenHelper {
     private static final String CREATE_LESSONS_TABLE = "CREATE TABLE " + LessonsTable.TABLE_NAME +
             " ( " + LessonsTable.ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             LessonsTable.DATE_ + " VARCHAR(100), " +
-            LessonsTable._ID_THEAM + " INTEGER, " +
+            LessonsTable._ID_THEME + " INTEGER, " +
             LessonsTable._ID_GROUP + " INTEGER, " +
             LessonsTable._ID_TEACHER + " INTEGER) ";
 
@@ -50,8 +50,8 @@ public class TeacherDataBase extends SQLiteOpenHelper {
     private static final String CREATE_THEME_TABLE = "CREATE TABLE " + ThemeTable.TABLE_NAME +
             " ( " + ThemeTable.ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             ThemeTable.ID_SUBJECT + " INTEGER, " +
-            ThemeTable.TITLE + "  VARCHAR(250), " +
-            ThemeTable.NUM_PP + " INTEGER )";
+            ThemeTable.ID_GROUP + " INTEGER, " +
+            ThemeTable.TITLE + "  VARCHAR(250) )";
 
     private static final String CREATE_SUBJECTS_TABLE = "CREATE TABLE " + SubjectsTable.TABLE_NAME +
             " ( " + SubjectsTable.ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -63,7 +63,7 @@ public class TeacherDataBase extends SQLiteOpenHelper {
             " ( " + GradesTable.ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             GradesTable.ID_LESSON + " INTEGER, " +
             GradesTable.ID_STUDENT + " INTEGER, " +
-            GradesTable.MARKS + " INTEGER ) ";
+            GradesTable.MARKS + " VARCHAR(50) ) ";
 
 
 
@@ -128,7 +128,7 @@ public class TeacherDataBase extends SQLiteOpenHelper {
         public static final String ID = BaseColumns._ID;
         public static final String TITLE = "title";
         public static final String ID_SUBJECT = "_id_subject";
-//        public static final String ID_GROUP = "_id_grups";
+        public static final String ID_GROUP = "_id_groups";
 
         public static final String NUM_PP = "num_pp";
     }
@@ -167,7 +167,7 @@ public class TeacherDataBase extends SQLiteOpenHelper {
 
         public static final String ID = BaseColumns._ID;
         public static final String DATE_ = "Data_";
-        public static final String _ID_THEAM = "_id_theme";
+        public static final String _ID_THEME = "_id_theme";
         public static final String _ID_GROUP = "_id_group";
         public static final String _ID_TEACHER = "_id_teacher";
     }

@@ -57,6 +57,10 @@
             android:name=".Activity.SubjectsTeacherActivity"
             android:label="@string/title_activity_subjects_teacher" >
         </activity>
+        <activity
+            android:name=".ThemeRegistration"
+            android:label="@string/title_activity_theme_registration" >
+        </activity>
     </application>
 
 </manifest>

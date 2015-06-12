@@ -71,9 +71,9 @@ setSupportActionBar(toolbar);
 //                        .withIcon(FontAwesome.Icon.faw_user),
 
                 new PrimaryDrawerItem().withName(R.string.groups)
-        .withIcon(FontAwesome.Icon.faw_group),
+                        .withIcon(FontAwesome.Icon.faw_group),
                 new PrimaryDrawerItem().withName(R.string.subjects)
-        .withIcon(FontAwesome.Icon.faw_book),
+                        .withIcon(FontAwesome.Icon.faw_book),
                 new PrimaryDrawerItem().withName(R.string.students)
                         .withIcon(getResources().getDrawable(R.drawable.ic_account_multiple_black_24dp)),
                 new DividerDrawerItem(),

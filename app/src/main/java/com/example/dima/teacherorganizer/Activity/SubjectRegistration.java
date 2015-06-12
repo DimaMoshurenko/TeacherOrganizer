@@ -5,7 +5,6 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -18,17 +17,14 @@ import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.dima.teacherorganizer.DataBase.TeacherDataBase;
 import com.example.dima.teacherorganizer.NavigationDrawer;
 import com.example.dima.teacherorganizer.R;
 import com.gc.materialdesign.views.ButtonFlat;
-import com.mikepenz.materialdrawer.model.interfaces.Nameable;
 import com.rengwuxian.materialedittext.MaterialAutoCompleteTextView;
 import com.rengwuxian.materialedittext.MaterialEditText;
-import com.rengwuxian.materialedittext.validation.RegexpValidator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +46,7 @@ public class SubjectRegistration extends ActionBarActivity {
         listGroups = new ArrayList<>();
         setContentView(R.layout.activity_subject_registration);
         database = new TeacherDataBase(this).getWritableDatabase();
-        final MaterialEditText newSubject = (MaterialEditText) findViewById(R.id.new_subject);
+        final MaterialEditText newSubject = (MaterialEditText) findViewById(R.id.new_theme);
         final MaterialEditText numberSubject = (MaterialEditText) findViewById(R.id.number_subject);
         ButtonFlat addSubject = (ButtonFlat) findViewById(R.id.add_subject);
         ListView groupsList = (ListView) findViewById(R.id.set_list_group_subjects);

@@ -5,7 +5,12 @@
     <dimen name="activity_horizontal_margin_small">8dp</dimen>
     <dimen name="button_wight">56dp</dimen>
     <dimen name="button_height">56dp</dimen>
+
     <dimen name="label_text_size">20dp</dimen>
+    <dimen name="padding_text_grade">5dp</dimen>
+    <dimen name="height_text_grade">30dp</dimen>
+    <dimen name="size_text_grade">15dp</dimen>
+
 
     <!-- Per the design guidelines, navigation drawers should be between 240dp and 320dp:
          https://developer.android.com/design/patterns/navigation-drawer.html -->

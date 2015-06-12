@@ -80,7 +80,7 @@ public class GroupsFragment extends Fragment implements AbsListView.OnItemClickL
             @Override
             public void onClick(View v) {
                 Intent myIntent = new Intent(getActivity(), GroupRegistration.class);
-                startActivityForResult(myIntent, 0);
+                startActivity(myIntent);
             }
         });
     }

@@ -13,8 +13,10 @@
 
     <string name="mail">Почта</string>
     <string name="new_subject"> Названия предмета </string>
+    <string name="new_theme"> Название теми </string>
     <string name="number_subject"> Номер предмета </string>
     <string name="add_subject"> Добавить предмет </string>
+    <string name="add_theme"> Добавить темиу </string>
 
 
     <string name="group_not_repeat_error_message">Такая группа не существует!</string>
@@ -68,5 +70,6 @@
     <string name="title_activity_subject_registration">SubjectRegistration</string>
     <string name="title_activity_table">TableActivity</string>
     <string name="title_activity_subjects_teacher">SubjectsTeacherActivity</string>
+    <string name="title_activity_theme_registration">ThemeRegistration</string>
 
 </resources>

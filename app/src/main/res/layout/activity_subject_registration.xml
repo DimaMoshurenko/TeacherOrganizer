@@ -19,7 +19,7 @@
         <com.rengwuxian.materialedittext.MaterialEditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/new_subject"
+            android:id="@+id/new_theme"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:hint="@string/new_subject" />
@@ -29,7 +29,7 @@
             android:layout_width="match_parent"
             android:id="@+id/number_subject"
             android:hint="@string/number_subject"
-            android:layout_below="@+id/new_subject"
+            android:layout_below="@+id/new_theme"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true" />
         <!--шифер предмета-->
