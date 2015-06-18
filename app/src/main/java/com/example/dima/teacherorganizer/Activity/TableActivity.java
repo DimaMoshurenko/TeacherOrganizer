@@ -1,30 +1,38 @@
 package com.example.dima.teacherorganizer.Activity;
 
 import android.app.Activity;
-import android.app.ListActivity;
+import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.example.dima.teacherorganizer.DataBase.TeacherDataBase;
 import com.example.dima.teacherorganizer.R;
 import com.example.dima.teacherorganizer.ThemeRegistration;
+import com.gc.materialdesign.views.ButtonFlat;
 
 import java.util.ArrayList;
+import java.util.Random;
 
-public class TableActivity extends ListActivity {
+public class TableActivity extends ActionBarActivity {
 
     private SQLiteDatabase database;
     public static final String ID_GROUP = " id group ";
@@ -32,12 +40,15 @@ public class TableActivity extends ListActivity {
     public static final String NUM_SUBJECT = " num subject ";
     private LinearLayout linearLayout;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.e("TAG", "table activity id groups " + String.valueOf(getIntent().getStringExtra(ID_GROUP)));
-        Log.e("TAG", "table activity id subjects " + String.valueOf(getIntent().getStringExtra(ID_SUBJECT)));
+//        Log.e("TAG", "table activity id groups " + String.valueOf(getIntent().getStringExtra(ID_GROUP)));
+//        Log.e("TAG", "table activity id subjects " + String.valueOf(getIntent().getStringExtra(ID_SUBJECT)));
         setContentView(R.layout.activity_table_grade);
+        ButtonFlat how = (ButtonFlat) findViewById(R.id.how);
+
         linearLayout = (LinearLayout) findViewById(R.id.header);
         database = new TeacherDataBase(TableActivity.this).getWritableDatabase();
 
@@ -58,22 +69,22 @@ public class TableActivity extends ListActivity {
         Cursor themes = database.query(tableThemes, fieldsThemes, whereThemes, null, null, null, null);
         // длинна шапки будет зависить от количества тем
 
-        ArrayList<RowTablesGrades> listTablesInformation = new ArrayList<>();
-        ArrayList<String> grads = new ArrayList<>();
-        ArrayList<String> listThemes = new ArrayList<>();
-        ArrayList<String> lessensList = new ArrayList<>();
+        final ArrayList<RowTablesGrades> listTablesInformation = new ArrayList<>();
 
-        RowTablesGrades information = null;
+
+        RowTablesGrades information;
         Cursor lessens = null;
-        if (students.moveToFirst()) {
+        if (students.moveToFirst())
             do {
                 information = new RowTablesGrades();
                 information.setStudentName(students.getString(students.getColumnIndex(TeacherDataBase.StudentTable.STUDENT_NAME)));
-                Log.e("TAG", " ok  student " + students.getString(students.getColumnIndex(TeacherDataBase.StudentTable.STUDENT_NAME)));
-                Log.e("TAG", " themes " + String.valueOf(themes.getCount()));
+//                Log.e("TAG", " ok  student " + students.getString(students.getColumnIndex(TeacherDataBase.StudentTable.STUDENT_NAME)));
+//                Log.e("TAG", " themes " + String.valueOf(themes.getCount()));
+                ArrayList<String> grads = new ArrayList<>();
                 if (themes.moveToFirst()) {
+                    ArrayList<String> listThemes = new ArrayList<>();
+
                     do {
-                        Log.e("TAG", "Themes ok");
                         // количество тем это количесво колонок не обезательно заполненых
                         listThemes.add(themes.getString(themes.getColumnIndex(TeacherDataBase.ThemeTable.TITLE)));
 
@@ -86,7 +97,6 @@ public class TableActivity extends ListActivity {
                                 themes.getString(themes.getColumnIndex(TeacherDataBase.ThemeTable.ID)) + " " + " and " +
                                 TeacherDataBase.LessonsTable._ID_GROUP + " = " + getIntent().getStringExtra(ID_GROUP) + "  and " +
                                 TeacherDataBase.LessonsTable._ID_TEACHER + " = " + LoginActivity.getIdTeacher() + " ;";
-
                         lessens = database.query(tableLessens, fieldsLessens, whereLessens, null, null, null, null);
                         if (lessens.moveToFirst()) {
 
@@ -103,6 +113,9 @@ public class TableActivity extends ListActivity {
                                 Cursor grades = database.query(tableGrades, fieldsGrades, whereGrades, null, null, null, null);
                                 if (grades.moveToFirst()) {
                                     do {
+//                                        Log.i("TAG", students.getString(students.getColumnIndex(TeacherDataBase.StudentTable.STUDENT_NAME)));
+//                                        Log.i("TAG", "grade " + grades.getString(grades.getColumnIndex(TeacherDataBase.GradesTable.MARKS)));
+//                                        Log.i("TAG", "theme " + themes.getString(themes.getColumnIndex(TeacherDataBase.ThemeTable.TITLE)));
                                         grads.add(grades.getString(grades.getColumnIndex(TeacherDataBase.GradesTable.MARKS)));
 
                                     } while (grades.moveToNext());
@@ -110,19 +123,20 @@ public class TableActivity extends ListActivity {
                                     grads.add("");
                                 }
 
+//                                grades.close();
                             } while (lessens.moveToNext());
 
                         }
-
+//                        lessens.close();
                     } while (themes.moveToNext());
+                    Log.e("TAG", "size " + String.valueOf(grads.size()));
                     information.setThemes(listThemes);
-                    information.setGrades(grads);
-                    information.setLessens(lessensList);
                 }
+                information.setGrades(grads);
+//                themes.close();
                 listTablesInformation.add(information);
             } while (students.moveToNext());
-        }
-
+        ArrayList<TextView> header = new ArrayList<>();
         if (themes.moveToFirst()) {
             do {
                 String tableLessens = TeacherDataBase.LessonsTable.TABLE_NAME;
@@ -137,25 +151,24 @@ public class TableActivity extends ListActivity {
 
                 lessens = database.query(tableLessens, fieldsLessens, whereLessens, null, null, null, null);
                 if (lessens.moveToFirst()) {
+                    ArrayList<String> lessensList = new ArrayList<>();
                     do {
                         lessensList.add(lessens.getString(lessens.getColumnIndex(TeacherDataBase.LessonsTable.DATE_)));
                         TextView data = new TextView(this);
                         data.setText(lessens.getString(lessens.getColumnIndex(TeacherDataBase.LessonsTable.DATE_)));
                         settingsLessensTextView(data);
                         linearLayout.addView(data);
-                        Log.e("TAG", "themes " + String.valueOf(lessens.getString(lessens.getColumnIndex(TeacherDataBase.LessonsTable.DATE_))));
+                        header.add(data);
                     } while (lessens.moveToNext());
                 }
             } while (themes.moveToNext());
-
-        }
-
+       }
 
         int dp = 5;
         final float scale = getResources().getDisplayMetrics().density;
         int paddingPx = (int) (dp * scale + 0.5f);
         Button addTheme = new Button(this);
-        addTheme.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, (int) (40 * scale + 0.5f)));
+        addTheme.setLayoutParams(new ViewGroup.LayoutParams((int) (100 * scale + 0.5f), (int) (40 * scale + 0.5f)));
         addTheme.setText("Тему добавить");
         addTheme.setPadding(paddingPx, paddingPx,
                 paddingPx, paddingPx);
@@ -172,8 +185,23 @@ public class TableActivity extends ListActivity {
         });
         linearLayout.addView(addTheme);
         Log.e("TAG", "list tables " + String.valueOf(listTablesInformation.size()));
-        TablesAdapter adapter = new TablesAdapter(this, listTablesInformation, lessensList);
-        setListAdapter(adapter);
+        TablesAdapter adapter = new TablesAdapter(this, listTablesInformation, header);
+        final ListView list = (ListView) findViewById(R.id.list_grades);
+        list.setAdapter(adapter);
+
+//        setListAdapter(adapter);
+
+
+        themes.close();
+        students.close();
+        how.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Random generator = new Random();
+                int i = generator.nextInt(listTablesInformation.size());
+                Toast.makeText(TableActivity.this, " Отвечать будет " + listTablesInformation.get(i).getStudentName(), Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     @Override
@@ -184,8 +212,10 @@ public class TableActivity extends ListActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_table, menu);
-        return true;
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_table, menu);
+        return super.onCreateOptionsMenu(menu);
+
     }
 
     @Override
@@ -207,13 +237,13 @@ public class TableActivity extends ListActivity {
 
         private final LayoutInflater inflater;
         private ArrayList<RowTablesGrades> listTablesInformation;
-        private ArrayList<String> themes;
+        private ArrayList<TextView> header;
         private Context context;
 
-        public TablesAdapter(Context context, ArrayList<RowTablesGrades> listTablesInformation, ArrayList<String> themes) {
+        public TablesAdapter(Context context, ArrayList<RowTablesGrades> listTablesInformation, ArrayList<TextView> header) {
             this.context = context;
             this.listTablesInformation = listTablesInformation;
-            this.themes = themes;
+            this.header = header;
             Activity activity = (Activity) context;
             this.inflater = activity.getLayoutInflater();
 
@@ -236,23 +266,67 @@ public class TableActivity extends ListActivity {
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            LinearLayout linearLayout = null;
-            RowTablesGrades info = listTablesInformation.get(position);
+            LinearLayout linearLayout;
+            final RowTablesGrades info = listTablesInformation.get(position);
+
+            Log.i("TAG", "Student name " + info.getStudentName());
+            Log.i("TAG", "size grades " + info.getGrades().size());
+            Log.i("TAG", "size lessens " + info.getLessens().size());
+            Log.i("TAG", "size theme " + info.getThemes().size());
+            Log.i("TAG", "size header " + header.size());
+
+
             if (convertView == null) {
                 convertView = inflater.inflate(R.layout.tables_colum, parent, false);
-                TextView name = (TextView) convertView.findViewById(R.id.name_student_grade);
+                final TextView name = (TextView) convertView.findViewById(R.id.name_student_grade);
                 name.setText(info.getStudentName());
                 linearLayout = (LinearLayout) convertView.findViewById(R.id.info);
-                for (int i = 0; i < themes.size(); i++) {
-                    TextView grade = new TextView(context);
-
+                String repeatTheme = null;
+                for (int i = 0; i < header.size(); i++) {
+                    final TextView grade = new TextView(context);
                     settingsGradsTextView(grade, 1);
-                    if (info.getGrades() != null) {
+                    if (info.getGrades().size() > i) {
                         grade.setText(info.getGrades().get(i));
                     } else {
                         grade.setText(" ");
                     }
                     linearLayout.addView(grade);
+                    final int index = i;
+                    grade.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            final String[] grades = new String[1];
+                            new MaterialDialog.Builder(TableActivity.this)
+                                    .title("Тема: " + info.getThemes().get(index))
+                                    .content(info.getStudentName())
+                                    .input("Оценка", null, new MaterialDialog.InputCallback() {
+                                        @Override
+                                        public void onInput(MaterialDialog dialog, CharSequence input) {
+                                            grades[0] = input.toString();
+                                        }
+                                    })
+                                    .dismissListener(
+                                            new DialogInterface.OnDismissListener() {
+                                                @Override
+                                                public void onDismiss(DialogInterface dialog) {
+                                                    Log.e("TAG", " on click "+grades[0]);
+                                                    Log.e("TAG", "student name " + info.getStudentName());
+//                                                    Log.e("TAG", " lessens "+String.valueOf(info.getLessens().get(index)));
+                                                    Log.e("TAG", " theme "+ info.getThemes().get(index));
+                                                    if (!grades[0].isEmpty()) {
+                                                        OnClickListener(info.getStudentName(), info.getThemes().get(index),
+                                                                grades[0], grade,header.get(index).getText().toString());
+                                                        Log.e("TAG", " grades " + grades[0]);
+
+                                                    }
+                                                }
+                                            }
+                                    )
+                                    .show();
+
+                        }
+                    });
+
                 }
             }
             return convertView;
@@ -310,7 +384,7 @@ public class TableActivity extends ListActivity {
         int dp = 5;
         final float scale = getResources().getDisplayMetrics().density;
         int paddingPx = (int) (dp * scale + 0.5f);
-        textView.setLayoutParams(new ViewGroup.LayoutParams((int) (96 * scale + 0.5f), R.dimen.height_text_grade));
+        textView.setLayoutParams(new ViewGroup.LayoutParams((int) (93 * scale + 0.5f), (int) (30 * scale + 0.5f)));
         textView.setBackgroundResource(R.drawable.border_text_view);
         textView.setPadding(paddingPx, paddingPx, paddingPx, paddingPx);
         textView.setTextSize(15);
@@ -325,5 +399,80 @@ public class TableActivity extends ListActivity {
 
         textView.setBackgroundResource(R.drawable.border_text_view);
         textView.setTextSize(20);
+    }
+
+    private void OnClickListener(String nameStudent, String nameTitleTheme, String grades, TextView grade, String data) {
+        if (grades.length() > 0 && getIntent().getStringExtra(ID_GROUP) != null && getIntent().getStringExtra(ID_SUBJECT) != null) {
+            database = new TeacherDataBase(TableActivity.this).getWritableDatabase();
+//                                                Log.e("TAG", "grads " + grades[0] + " student name " + info.getStudentName());
+            String tableStudents = TeacherDataBase.StudentTable.TABLE_NAME;
+            String[] fieldsStudents = {TeacherDataBase.StudentTable.ID, TeacherDataBase.StudentTable._ID_TEACHER,
+                    TeacherDataBase.StudentTable._ID_GROUP, TeacherDataBase.StudentTable.STUDENT_NAME};
+
+            String whereStudents = TeacherDataBase.StudentTable._ID_GROUP + " = " + getIntent().getStringExtra(ID_GROUP) + " and " +
+                    TeacherDataBase.StudentTable._ID_TEACHER + " = " + LoginActivity.getIdTeacher() + " and " +
+                    TeacherDataBase.StudentTable.STUDENT_NAME + " = '" + nameStudent + "' ;";
+            Cursor student = database.query(tableStudents, fieldsStudents, whereStudents, null, null, null, null);
+            String idStudent = null;
+            String idTheme = null;
+            String idLessen = null;
+            Log.e("TAG", "theme bed");
+            String tableTheme = TeacherDataBase.ThemeTable.TABLE_NAME;
+            String[] fieldsTheme = {TeacherDataBase.ThemeTable.ID, TeacherDataBase.ThemeTable.ID_SUBJECT,
+                    TeacherDataBase.ThemeTable.ID_SUBJECT, TeacherDataBase.ThemeTable.TITLE};
+            String whereTheme = TeacherDataBase.ThemeTable.ID_SUBJECT + " = " + getIntent().getStringExtra(ID_SUBJECT) + " and " +
+                    TeacherDataBase.ThemeTable.ID_GROUP + " = " + getIntent().getStringExtra(ID_GROUP) + " and " +
+                    TeacherDataBase.ThemeTable.TITLE + " = '" + nameTitleTheme + "'  ;";
+
+            Cursor theme = database.query(tableTheme, fieldsTheme, whereTheme, null, null, null, null);
+
+            if (theme.moveToFirst()) {
+                Log.e("TAG", "theme okey");
+                idTheme = theme.getString(theme.getColumnIndex(TeacherDataBase.ThemeTable.ID));
+                String tableLessens = TeacherDataBase.LessonsTable.TABLE_NAME;
+                String[] fieldsLessens = {TeacherDataBase.LessonsTable.ID, TeacherDataBase.LessonsTable._ID_GROUP,
+                        TeacherDataBase.LessonsTable._ID_TEACHER, TeacherDataBase.LessonsTable._ID_THEME,
+                        TeacherDataBase.LessonsTable.DATE_};
+
+                String whereLessens = TeacherDataBase.LessonsTable._ID_THEME + " = " + idTheme + " " + " and " +
+                        TeacherDataBase.LessonsTable._ID_GROUP + " = " + getIntent().getStringExtra(ID_GROUP) + "  and " +
+                        TeacherDataBase.LessonsTable.DATE_ + " = '" + data + "'  and " +
+                        TeacherDataBase.LessonsTable._ID_TEACHER + " = " + LoginActivity.getIdTeacher() + " ;";
+
+                Cursor lessen = database.query(tableLessens, fieldsLessens, whereLessens, null, null, null, null);
+                if (lessen.moveToFirst()) {
+                    do {
+                        idLessen = lessen.getString(lessen.getColumnIndex(TeacherDataBase.LessonsTable.ID));
+                        if (student.moveToFirst()) {
+                            idStudent = student.getString(student.getColumnIndex(TeacherDataBase.StudentTable.ID));
+
+//                            String tableGrades = TeacherDataBase.GradesTable.TABLE_NAME;
+//                            String[] fieldsGrades = {TeacherDataBase.GradesTable.ID, TeacherDataBase.GradesTable.ID_STUDENT,
+//                                    TeacherDataBase.GradesTable.ID_LESSON, TeacherDataBase.GradesTable.MARKS};
+//
+//                            String whereGrades = TeacherDataBase.GradesTable.ID_LESSON + " = " + idLessen + " and " +
+//                                    TeacherDataBase.GradesTable.ID_STUDENT + " = " + idStudent + " ;";
+//
+//                            Cursor grades = database.query(tableGrades, fieldsGrades, whereGrades, null, null, null, null);
+
+                            ContentValues content = new ContentValues();
+
+                            content.put(TeacherDataBase.GradesTable.ID_STUDENT, idStudent);
+                            content.put(TeacherDataBase.GradesTable.ID_LESSON, idLessen);
+                            content.put(TeacherDataBase.GradesTable.MARKS, grades);
+                            database.insert(TeacherDataBase.GradesTable.TABLE_NAME, null, content);
+                            grade.setText(grades);
+                            Log.e("TAG", " student " + idStudent);
+                            Log.e("TAG", " lessens " + idLessen);
+                            Log.e("TAG", " theme " + idTheme);
+                            Log.e("TAG", " okey greds add");
+                        }
+                    }
+                    while (lessen.moveToNext());
+                }
+            }
+        } else {
+            Log.e("TAG", "Error");
+        }
     }
 }

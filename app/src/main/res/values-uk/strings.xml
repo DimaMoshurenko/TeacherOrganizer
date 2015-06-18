@@ -1,0 +1,80 @@
+<resources>
+    <string name="action_settings">Налаштування</string>
+    <string name="delete_db">Очистка Бази даних </string>
+    <string name="title_activity_navigetion_drawer">NavigetionDrawer</string>
+
+    <string name="subjects">Предмети</string>
+    <string name="groups">Групи</string>
+    <string name="groups_learning">Групи в яких читають цей предмет </string>
+    <string name="group">Група</string>
+
+    <string name="mail">Почта</string>
+    <string name="new_subject"> Назва предмета </string>
+    <string name="new_theme"> Назва теми </string>
+    <string name="number_subject"> Номер предмета </string>
+    <string name="add_subject"> Додати предмет </string>
+    <string name="add_theme"> Додати темиу </string>
+
+    <string name="group_not_repeat_error_message">Такая группа не существует!</string>
+    <string name="students">Студенти</string>
+    <string name="teachers">Вчителя</string>
+
+    <string name="name">Імя</string>
+    <string name="surname">Прізвище</string>
+    <string name="middle_name">По батькові</string>
+
+    <string name="password">Пароль</string>
+    <string name="login">Логін</string>
+    <string name="phone_number">Номер телефона</string>
+    <string name="not_empty_warning">Поле не заповнене, заполніть будь-ласка.</string>
+    <string name="login_not_empty_warning">Введіть Логін будь-ласка.</string>
+    <string name="password_not_empty_warning">Введіть пароль будь-ласка.</string>
+    <string name="passwords_are_different">Паролі різні, перевірте введений пароль.</string>
+    <string name="login_are_different">Логін такой вже існую, введенний другой.</string>
+
+    <string name="passwords_login_incorrect">Перевірте логін або пароль.</string>
+    <string name="add_group">Додати групу </string>
+    <string name="how"> Хто буде відповідати ?</string>
+    <string name="name_group">Назва групи </string>
+    <string name="name_kuratora">Куратор П.І.П. </string>
+    <string name="number_kuratora">Номер телефона Куратора</string>
+
+    <string name="password_repeat">Повторіть Пароль</string>
+    <string name="sing">Війти</string>
+    <string name="registration">Зареєструватись</string>
+    <string name="drawer_item_home">Home</string>
+    <string name="drawer_item_free_play">Free Play</string>
+    <string name="drawer_item_custom">Custom</string>
+    <string name="settings">Налаштування</string>
+    <string name="exit">Вихід</string>
+    <string name="drawer_item_help">Help</string>
+    <string name="drawer_item_open_source">Open Source</string>
+    <string name="drawer_item_contact">Contact</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_example">Example action</string>
+    <string name="teacher_title">Вчитель</string>
+    <string name="title_activity_student_registration">Регистрация Студента</string>
+
+    <string name="add_student">Додати Студента</string>
+    <string name="add_teacher">Додати Вчителя</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_group_registration">Реєстрація групи</string>
+    <string name="title_activity_subject_registration">Реєстрація предмета</string>
+    <string name="title_activity_table">TableActivity</string>
+    <string name="title_activity_subjects_teacher">SubjectsTeacherActivity</string>
+    <string name="title_activity_theme_registration">Регістрація теми</string>
+    <string name="title_activity_student_information">StudentInformationActivity</string>
+
+    <!-- Student information -->
+    <string name="email_student">Пошта:</string>
+    <string name="phone_student">Номер телефона:</string>
+    <string name="name_student">Імя:</string>
+    <string name="groups_student">Група:</string>
+
+
+</resources>

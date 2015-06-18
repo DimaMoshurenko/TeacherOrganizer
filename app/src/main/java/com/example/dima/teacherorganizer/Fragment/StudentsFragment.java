@@ -20,12 +20,14 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.dima.teacherorganizer.Activity.LoginActivity;
 import com.example.dima.teacherorganizer.Activity.SubjectRegistration;
 import com.example.dima.teacherorganizer.Activity.SubjectsTeacherActivity;
 import com.example.dima.teacherorganizer.DataBase.TeacherDataBase;
+import com.example.dima.teacherorganizer.InformatoinActivity.StudentInformationActivity;
 import com.example.dima.teacherorganizer.R;
 import com.example.dima.teacherorganizer.Activity.StudentRegistration;
 import com.gc.materialdesign.views.ButtonFloat;
@@ -124,9 +126,12 @@ public class StudentsFragment extends Fragment implements AbsListView.OnItemClic
         if(LoginActivity.getIdTeacher()!=null) {
             Cursor cursor = database.query(TeacherDataBase.StudentTable.TABLE_NAME,
                     new String[]{TeacherDataBase.StudentTable.ID, TeacherDataBase.StudentTable.STUDENT_NAME},
-                    TeacherDataBase.StudentTable._ID_TEACHER + " = ? ", new String[]{LoginActivity.getIdTeacher()}, null, null, null);
+                    TeacherDataBase.StudentTable._ID_TEACHER + " = ? ", new String[]{LoginActivity.getIdTeacher()},
+                    null, null, null);
             mAdapter = new SimpleCursorAdapter(getActivity(), R.layout.item_list_fragment, cursor, from, to, 0);
             mListView.setAdapter(mAdapter);
+
+
         }
 
 
@@ -174,8 +179,23 @@ public class StudentsFragment extends Fragment implements AbsListView.OnItemClic
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         if (null != mListener) {
-            // Notify the active callbacks interface (the activity, if the
-            // fragment is attached to one) that an item has been selected
+            TextView student = (TextView) view.findViewById(R.id.other_name);
+            Log.e("TAG", "student " + String.valueOf(student.getText()));
+            database = new TeacherDataBase(getActivity()).getWritableDatabase();
+            Intent myIntent = new Intent(getActivity(), StudentInformationActivity.class);
+            Cursor cursor = database.query(TeacherDataBase.StudentTable.TABLE_NAME,
+                    new String[]{TeacherDataBase.StudentTable.STUDENT_NAME, TeacherDataBase.StudentTable.ID},
+                    TeacherDataBase.StudentTable.STUDENT_NAME + " = ? ", new String[]{student.getText().toString()},
+                    null, null, null, null);
+            String idStudent = null;
+            if (cursor.moveToFirst()) {
+                do {
+                    idStudent = cursor.getString(cursor.getColumnIndex(TeacherDataBase.StudentTable.ID));
+                } while (cursor.moveToNext());
+            }
+
+            myIntent.putExtra(StudentInformationActivity.ID_STUDENT, idStudent);
+            startActivity(myIntent);
             // Открывать подробную и инфрмацию студента
             mListener.onFragmentInteraction("OK");
         }

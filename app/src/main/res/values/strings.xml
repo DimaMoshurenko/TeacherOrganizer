@@ -38,8 +38,9 @@
 
     <string name="passwords_login_incorrect">Проверте логин или пароль.</string>
     <string name="add_group">Добавить групу </string>
+    <string name="how"> Кто будет отвечать </string>
     <string name="name_group">Название групи </string>
-    <string name="name_kuratora">Кратор Ф.И.О. </string>
+    <string name="name_kuratora">Куратор Ф.И.О. </string>
     <string name="number_kuratora">Номер телефона Куратора</string>
 
     <string name="password_repeat">Повторите Пароль</string>
@@ -71,5 +72,13 @@
     <string name="title_activity_table">TableActivity</string>
     <string name="title_activity_subjects_teacher">SubjectsTeacherActivity</string>
     <string name="title_activity_theme_registration">ThemeRegistration</string>
+    <string name="title_activity_student_information">StudentInformationActivity</string>
+
+    <!-- Student information -->
+    <string name="email_student">Почта:</string>
+    <string name="phone_student">Номер телефона:</string>
+    <string name="name_student">Имя:</string>
+    <string name="groups_student">Група:</string>
+
 
 </resources>

@@ -28,11 +28,8 @@ public class LoginActivity extends ActionBarActivity {
 private static String idTeacher;
 
     public static String getIdTeacher() {
-        Log.e("TAG"," id teacher "+ idTeacher);
         return idTeacher;
     }
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
