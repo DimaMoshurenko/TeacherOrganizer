@@ -30,6 +30,7 @@ import com.example.dima.teacherorganizer.ThemeRegistration;
 import com.gc.materialdesign.views.ButtonFlat;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class TableActivity extends ActionBarActivity {
@@ -48,7 +49,6 @@ public class TableActivity extends ActionBarActivity {
 //        Log.e("TAG", "table activity id subjects " + String.valueOf(getIntent().getStringExtra(ID_SUBJECT)));
         setContentView(R.layout.activity_table_grade);
         ButtonFlat how = (ButtonFlat) findViewById(R.id.how);
-
         linearLayout = (LinearLayout) findViewById(R.id.header);
         database = new TeacherDataBase(TableActivity.this).getWritableDatabase();
 
@@ -70,23 +70,22 @@ public class TableActivity extends ActionBarActivity {
         // длинна шапки будет зависить от количества тем
 
         final ArrayList<RowTablesGrades> listTablesInformation = new ArrayList<>();
-
-
         RowTablesGrades information;
         Cursor lessens = null;
         if (students.moveToFirst())
             do {
                 information = new RowTablesGrades();
                 information.setStudentName(students.getString(students.getColumnIndex(TeacherDataBase.StudentTable.STUDENT_NAME)));
+                ArrayList<GradsDataTheme> listThemes = new ArrayList<>();
 //                Log.e("TAG", " ok  student " + students.getString(students.getColumnIndex(TeacherDataBase.StudentTable.STUDENT_NAME)));
 //                Log.e("TAG", " themes " + String.valueOf(themes.getCount()));
-                ArrayList<String> grads = new ArrayList<>();
                 if (themes.moveToFirst()) {
-                    ArrayList<String> listThemes = new ArrayList<>();
 
                     do {
+
+                        GradsDataTheme gradsThemeData = new GradsDataTheme();
                         // количество тем это количесво колонок не обезательно заполненых
-                        listThemes.add(themes.getString(themes.getColumnIndex(TeacherDataBase.ThemeTable.TITLE)));
+                        gradsThemeData.setThemeTitle(themes.getString(themes.getColumnIndex(TeacherDataBase.ThemeTable.TITLE)));
 
                         String tableLessens = TeacherDataBase.LessonsTable.TABLE_NAME;
                         String[] fieldsLessens = {TeacherDataBase.LessonsTable.ID, TeacherDataBase.LessonsTable._ID_GROUP,
@@ -98,9 +97,10 @@ public class TableActivity extends ActionBarActivity {
                                 TeacherDataBase.LessonsTable._ID_GROUP + " = " + getIntent().getStringExtra(ID_GROUP) + "  and " +
                                 TeacherDataBase.LessonsTable._ID_TEACHER + " = " + LoginActivity.getIdTeacher() + " ;";
                         lessens = database.query(tableLessens, fieldsLessens, whereLessens, null, null, null, null);
+                        ArrayList<String> grads = new ArrayList<>();
                         if (lessens.moveToFirst()) {
-
                             do {
+                                gradsThemeData.setData(lessens.getString(lessens.getColumnIndex(TeacherDataBase.LessonsTable.DATE_)));
                                 String tableGrades = TeacherDataBase.GradesTable.TABLE_NAME;
                                 String[] fieldsGrades = {TeacherDataBase.GradesTable.ID, TeacherDataBase.GradesTable.ID_STUDENT,
                                         TeacherDataBase.GradesTable.ID_LESSON, TeacherDataBase.GradesTable.MARKS};
@@ -111,6 +111,8 @@ public class TableActivity extends ActionBarActivity {
                                         students.getString(students.getColumnIndex(TeacherDataBase.StudentTable.ID)) + " ;";
 
                                 Cursor grades = database.query(tableGrades, fieldsGrades, whereGrades, null, null, null, null);
+
+
                                 if (grades.moveToFirst()) {
                                     do {
 //                                        Log.i("TAG", students.getString(students.getColumnIndex(TeacherDataBase.StudentTable.STUDENT_NAME)));
@@ -123,17 +125,16 @@ public class TableActivity extends ActionBarActivity {
                                     grads.add("");
                                 }
 
-//                                grades.close();
+                                Log.e("TAG", "size " + String.valueOf(grads.size()));
+                                gradsThemeData.setGrads(grads);
                             } while (lessens.moveToNext());
-
                         }
-//                        lessens.close();
+                        listThemes.add(gradsThemeData);
                     } while (themes.moveToNext());
-                    Log.e("TAG", "size " + String.valueOf(grads.size()));
-                    information.setThemes(listThemes);
+                    information.setGradsDataTheme(listThemes);
                 }
-                information.setGrades(grads);
 //                themes.close();
+
                 listTablesInformation.add(information);
             } while (students.moveToNext());
         ArrayList<TextView> header = new ArrayList<>();
@@ -162,7 +163,7 @@ public class TableActivity extends ActionBarActivity {
                     } while (lessens.moveToNext());
                 }
             } while (themes.moveToNext());
-       }
+        }
 
         int dp = 5;
         final float scale = getResources().getDisplayMetrics().density;
@@ -267,67 +268,81 @@ public class TableActivity extends ActionBarActivity {
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             LinearLayout linearLayout;
-            final RowTablesGrades info = listTablesInformation.get(position);
+            final RowTablesGrades studentInformation = listTablesInformation.get(position);
 
-            Log.i("TAG", "Student name " + info.getStudentName());
-            Log.i("TAG", "size grades " + info.getGrades().size());
-            Log.i("TAG", "size lessens " + info.getLessens().size());
-            Log.i("TAG", "size theme " + info.getThemes().size());
+            Log.i("TAG", "Student name " + studentInformation.getStudentName());
+            Log.i("TAG", "size grades " + studentInformation.getGradsDataTheme().size());
+
             Log.i("TAG", "size header " + header.size());
 
 
             if (convertView == null) {
                 convertView = inflater.inflate(R.layout.tables_colum, parent, false);
                 final TextView name = (TextView) convertView.findViewById(R.id.name_student_grade);
-                name.setText(info.getStudentName());
+                name.setText(studentInformation.getStudentName());
                 linearLayout = (LinearLayout) convertView.findViewById(R.id.info);
                 String repeatTheme = null;
-                for (int i = 0; i < header.size(); i++) {
-                    final TextView grade = new TextView(context);
-                    settingsGradsTextView(grade, 1);
-                    if (info.getGrades().size() > i) {
-                        grade.setText(info.getGrades().get(i));
-                    } else {
-                        grade.setText(" ");
-                    }
-                    linearLayout.addView(grade);
-                    final int index = i;
-                    grade.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            final String[] grades = new String[1];
-                            new MaterialDialog.Builder(TableActivity.this)
-                                    .title("Тема: " + info.getThemes().get(index))
-                                    .content(info.getStudentName())
-                                    .input("Оценка", null, new MaterialDialog.InputCallback() {
-                                        @Override
-                                        public void onInput(MaterialDialog dialog, CharSequence input) {
-                                            grades[0] = input.toString();
-                                        }
-                                    })
-                                    .dismissListener(
-                                            new DialogInterface.OnDismissListener() {
-                                                @Override
-                                                public void onDismiss(DialogInterface dialog) {
-                                                    Log.e("TAG", " on click "+grades[0]);
-                                                    Log.e("TAG", "student name " + info.getStudentName());
-//                                                    Log.e("TAG", " lessens "+String.valueOf(info.getLessens().get(index)));
-                                                    Log.e("TAG", " theme "+ info.getThemes().get(index));
-                                                    if (!grades[0].isEmpty()) {
-                                                        OnClickListener(info.getStudentName(), info.getThemes().get(index),
-                                                                grades[0], grade,header.get(index).getText().toString());
-                                                        Log.e("TAG", " grades " + grades[0]);
 
+                if (header.size() == studentInformation.getGradsDataTheme().size()) {
+                    for (int i = 0; i < header.size(); i++) {
+                        final TextView grade = new TextView(context);
+                        settingsGradsTextView(grade, 1);
+
+                        if (studentInformation.getGradsDataTheme().get(i).getGrads().size() > 1) {
+                            String grads = new String();
+                            for (int j = 0; j < studentInformation.getGradsDataTheme().get(i).getGrads().size(); j++) {
+                                Log.e("TAG", String.valueOf(j) + " = "
+                                        + String.valueOf(studentInformation.getGradsDataTheme().get(i).getGrads().size() - 1));
+                                grads = grads + studentInformation.getGradsDataTheme().get(i).getGrads().get(j);
+                                if (j == studentInformation.getGradsDataTheme().get(i).getGrads().size() - 1) {
+                                    grads = grads +".";
+                                } else {
+                                    grads = grads +",";
+                                }
+
+                            }
+                            grade.setText(grads);
+                        } else {
+                            grade.setText(" ");
+                        }
+                        linearLayout.addView(grade);
+                        final int index = i;
+                        grade.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                final String[] grades = new String[1];
+                                new MaterialDialog.Builder(TableActivity.this)
+                                        .title("Тема: " + studentInformation.getGradsDataTheme().get(index).getThemeTitle())
+                                        .content(studentInformation.getStudentName())
+                                        .input("Оценка", null, new MaterialDialog.InputCallback() {
+                                            @Override
+                                            public void onInput(MaterialDialog dialog, CharSequence input) {
+                                                grades[0] = input.toString();
+                                            }
+                                        })
+                                        .dismissListener(
+                                                new DialogInterface.OnDismissListener() {
+                                                    @Override
+                                                    public void onDismiss(DialogInterface dialog) {
+                                                        Log.e("TAG", " on click " + grades[0]);
+                                                        Log.e("TAG", "student name " + studentInformation.getStudentName());
+//                                                    Log.e("TAG", " lessens "+String.valueOf(info.getLessens().get(index)));
+
+                                                        if (grades[0] != null & !grades[0].isEmpty()) {
+                                                            OnClickListener(studentInformation.getStudentName(), studentInformation.getGradsDataTheme().get(index).getThemeTitle(),
+                                                                    grades[0], grade, header.get(index).getText().toString());
+                                                            Log.e("TAG", " grades " + grades[0]);
+                                                        }
                                                     }
                                                 }
-                                            }
-                                    )
-                                    .show();
+                                        )
+                                        .show();
+                            }
+                        });
 
-                        }
-                    });
-
+                    }
                 }
+
             }
             return convertView;
         }
@@ -335,32 +350,15 @@ public class TableActivity extends ActionBarActivity {
 
     public class RowTablesGrades {
         private String studentName;
-        private ArrayList<String> grades;
-        private ArrayList<String> themes;
-        private ArrayList<String> lessens;
+        private ArrayList<GradsDataTheme> themes;
 
-        public ArrayList<String> getLessens() {
-            return lessens;
-        }
-
-        public void setLessens(ArrayList<String> lessens) {
-            this.lessens = lessens;
-        }
-
-        public void setThemes(ArrayList<String> themes) {
+        public void setGradsDataTheme(ArrayList<GradsDataTheme> themes) {
             this.themes = themes;
         }
 
-        public ArrayList<String> getThemes() {
+        public List<GradsDataTheme> getGradsDataTheme() {
 
             return themes;
-        }
-
-        public RowTablesGrades() {
-            grades = new ArrayList<>();
-            themes = new ArrayList<>();
-            lessens = new ArrayList<>();
-//            studentName = new String();
         }
 
         public String getStudentName() {
@@ -368,15 +366,38 @@ public class TableActivity extends ActionBarActivity {
         }
 
         public void setStudentName(String studentName) {
+
             this.studentName = studentName;
         }
+    }
 
-        public ArrayList<String> getGrades() {
-            return grades;
+    public class GradsDataTheme {
+        private String themeTitle;
+        private String data;
+        private ArrayList<String> grads;
+
+        public String getThemeTitle() {
+            return themeTitle;
         }
 
-        public void setGrades(ArrayList<String> grades) {
-            this.grades = grades;
+        public void setThemeTitle(String themeTitle) {
+            this.themeTitle = themeTitle;
+        }
+
+        public String getData() {
+            return data;
+        }
+
+        public void setData(String data) {
+            this.data = data;
+        }
+
+        public ArrayList<String> getGrads() {
+            return grads;
+        }
+
+        public void setGrads(ArrayList<String> grads) {
+            this.grads = grads;
         }
     }
 
