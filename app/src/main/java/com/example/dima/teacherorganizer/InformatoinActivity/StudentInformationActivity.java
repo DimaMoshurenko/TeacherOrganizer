@@ -19,18 +19,21 @@ public class StudentInformationActivity extends ActionBarActivity {
 
 
     public static final String ID_STUDENT = "id student";
+    public static  String idStudent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_student_information);
-        Log.e("TAG", "intent " + getIntent().getStringExtra(ID_STUDENT));
+//        setTitle(getResources().getString(R.string.other_information));
+        idStudent = getIntent().getStringExtra(ID_STUDENT);
+        Log.e("TAG", "intent " + idStudent);
         SQLiteDatabase database = new TeacherDataBase(this).getReadableDatabase();
 
         Cursor cursor = database.query(TeacherDataBase.StudentTable.TABLE_NAME,
                 new String[]{TeacherDataBase.StudentTable.STUDENT_NAME, TeacherDataBase.StudentTable.STUDENT_MAIL,
                         TeacherDataBase.StudentTable.TELEPHONE_NUMBER, TeacherDataBase.StudentTable._ID_GROUP, TeacherDataBase.StudentTable.ID},
-                TeacherDataBase.StudentTable.ID + " = ? ", new String[]{getIntent().getStringExtra(ID_STUDENT)},
+                TeacherDataBase.StudentTable.ID + " = ? ", new String[]{idStudent},
                 null, null, null, null);
         TextView email = (TextView) findViewById(R.id.information_student_email);
         TextView name = (TextView) findViewById(R.id.information_student_name);

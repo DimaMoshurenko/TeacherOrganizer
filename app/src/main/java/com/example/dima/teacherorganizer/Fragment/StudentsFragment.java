@@ -23,17 +23,19 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.example.dima.teacherorganizer.Activity.LoginActivity;
 import com.example.dima.teacherorganizer.Activity.SubjectRegistration;
 import com.example.dima.teacherorganizer.Activity.SubjectsTeacherActivity;
 import com.example.dima.teacherorganizer.DataBase.TeacherDataBase;
+import com.example.dima.teacherorganizer.InformatoinActivity.GroupInformationActivity;
 import com.example.dima.teacherorganizer.InformatoinActivity.StudentInformationActivity;
 import com.example.dima.teacherorganizer.R;
 import com.example.dima.teacherorganizer.Activity.StudentRegistration;
 import com.gc.materialdesign.views.ButtonFloat;
 
 public class StudentsFragment extends Fragment implements AbsListView.OnItemClickListener,
-        LoaderManager.LoaderCallbacks<Cursor> {
+        LoaderManager.LoaderCallbacks<Cursor>, AdapterView.OnItemLongClickListener {
 
     private OnFragmentInteractionListener mListener;
     private ListView mListView;
@@ -81,8 +83,8 @@ public class StudentsFragment extends Fragment implements AbsListView.OnItemClic
                 database.delete(TeacherDataBase.TeachersTable.TABLE_NAME, null, null);
                 database.delete(TeacherDataBase.StudentTable.TABLE_NAME, null, null);
 
-                Log.e("TAg", " clearn "+LoginActivity.getIdTeacher());
-                Intent intent = new Intent(getActivity(),LoginActivity.class);
+                Log.e("TAg", " clearn " + LoginActivity.getIdTeacher());
+                Intent intent = new Intent(getActivity(), LoginActivity.class);
                 startActivity(intent);
                 return true;
             default:
@@ -123,7 +125,7 @@ public class StudentsFragment extends Fragment implements AbsListView.OnItemClic
         super.onViewCreated(view, savedInstanceState);
 
         database = new TeacherDataBase(getActivity()).getWritableDatabase();
-        if(LoginActivity.getIdTeacher()!=null) {
+        if (LoginActivity.getIdTeacher() != null) {
             Cursor cursor = database.query(TeacherDataBase.StudentTable.TABLE_NAME,
                     new String[]{TeacherDataBase.StudentTable.ID, TeacherDataBase.StudentTable.STUDENT_NAME},
                     TeacherDataBase.StudentTable._ID_TEACHER + " = ? ", new String[]{LoginActivity.getIdTeacher()},
@@ -137,23 +139,23 @@ public class StudentsFragment extends Fragment implements AbsListView.OnItemClic
 
         // Set OnItemClickListener so we can be notified on item clicks
         mListView.setOnItemClickListener(this);
+        mListView.setOnItemLongClickListener(this);
         addTeacher = (ButtonFloat) view.findViewById(R.id.float_button_groups);
         addTeacher.setBackgroundColor(getResources().getColor(R.color.color_primary));
         addTeacher.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Cursor cursor = database.query(TeacherDataBase.SubjectsTable.TABLE_NAME,
-                        new String[]{TeacherDataBase.SubjectsTable.ID,TeacherDataBase.SubjectsTable.ID_TEACHER},
+                        new String[]{TeacherDataBase.SubjectsTable.ID, TeacherDataBase.SubjectsTable.ID_TEACHER},
                         TeacherDataBase.SubjectsTable.ID_TEACHER + " = ? ", new String[]{LoginActivity.getIdTeacher()}, null, null, null, null);
                 cursor.moveToLast();
 //                Log.e("TAG", "  cursor " + !cursor.isNull(cursor.getColumnIndex(TeacherDataBase.SubjectsTable.ID)));
-                if(LoginActivity.getIdTeacher()!=null&&cursor.getCount()>0) {
+                if (LoginActivity.getIdTeacher() != null && cursor.getCount() > 0) {
                     Intent myIntent = new Intent(getActivity(), StudentRegistration.class);
                     startActivityForResult(myIntent, 0);
-                }else{
+                } else {
                     Toast.makeText(getActivity(), "Добавте сначала предмет прежде чем добавить Сдентов !", Toast.LENGTH_SHORT).show();
                 }
-
 
             }
         });
@@ -196,7 +198,6 @@ public class StudentsFragment extends Fragment implements AbsListView.OnItemClic
 
             myIntent.putExtra(StudentInformationActivity.ID_STUDENT, idStudent);
             startActivity(myIntent);
-            // Открывать подробную и инфрмацию студента
             mListener.onFragmentInteraction("OK");
         }
     }
@@ -230,6 +231,60 @@ public class StudentsFragment extends Fragment implements AbsListView.OnItemClic
 // data is not available anymore, delete reference
 
         mAdapter.swapCursor(null);
+    }
+
+    @Override
+    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+        if (null != mListener) {
+            TextView student = (TextView) view.findViewById(R.id.other_name);
+
+            database = new TeacherDataBase(getActivity()).getWritableDatabase();
+
+            Cursor cursor = database.query(TeacherDataBase.StudentTable.TABLE_NAME,
+                    new String[]{TeacherDataBase.StudentTable.STUDENT_NAME, TeacherDataBase.StudentTable.ID},
+                    TeacherDataBase.StudentTable.STUDENT_NAME + " = ? ", new String[]{student.getText().toString()},
+                    null, null, null, null);
+            String idStudent = null;
+            String nameStudent = null;
+            if (cursor.moveToFirst()) {
+                do {
+                    idStudent = cursor.getString(cursor.getColumnIndex(TeacherDataBase.StudentTable.ID));
+                    nameStudent = cursor.getString(cursor.getColumnIndex(TeacherDataBase.StudentTable.STUDENT_NAME));
+                } while (cursor.moveToNext());
+            }
+
+            final String finalIdStudent = idStudent;
+            new MaterialDialog.Builder(getActivity())
+                    .title(R.string.delete_student)
+                    .content(nameStudent)
+                    .positiveText(R.string.delete)
+                    .negativeText(R.string.okey)
+                    .callback(new MaterialDialog.ButtonCallback() {
+                        @Override
+                        public void onPositive(MaterialDialog dialog) {
+                            try {
+                                database.delete(TeacherDataBase.StudentTable.TABLE_NAME,
+                                        TeacherDataBase.StudentTable.ID+ " = ?",new String[]{finalIdStudent} );
+                                database.delete(TeacherDataBase.GradesTable.TABLE_NAME,
+                                        TeacherDataBase.GradesTable.ID_STUDENT+ " = ?",new String[]{finalIdStudent});
+                                mListView.notifyAll();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            } finally {
+                                database.close();
+                                dialog.dismiss();
+                            }
+                        }
+
+                        @Override
+                        public void onNegative(MaterialDialog dialog) {
+                            dialog.dismiss();
+                        }
+                    }).show();
+            // Открывать подробную и инфрмацию студента
+            mListener.onFragmentInteraction("OK");
+        }
+        return false;
     }
 
     public interface OnFragmentInteractionListener {

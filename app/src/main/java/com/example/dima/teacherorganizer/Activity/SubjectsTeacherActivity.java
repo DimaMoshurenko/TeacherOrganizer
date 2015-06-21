@@ -92,6 +92,7 @@ public class SubjectsTeacherActivity extends ActionBarActivity {
                     intent.putExtra(TableActivity.ID_SUBJECT, idSubject);
 //                    intent.putExtra(TableActivity.NUM_SUBJECT, numSubject);
                     startActivity(intent);
+                    finish();
                 }
             });
         }

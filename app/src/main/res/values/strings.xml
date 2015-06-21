@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">TeacherOrganizer</string>
+    <string name="app_name">Органайзер учителя</string>
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
@@ -16,7 +16,7 @@
     <string name="new_theme"> Название теми </string>
     <string name="number_subject"> Номер предмета </string>
     <string name="add_subject"> Добавить предмет </string>
-    <string name="add_theme"> Добавить темиу </string>
+    <string name="add_theme"> Добавить тему </string>
 
 
     <string name="group_not_repeat_error_message">Такая группа не существует!</string>
@@ -79,6 +79,19 @@
     <string name="phone_student">Номер телефона:</string>
     <string name="name_student">Имя:</string>
     <string name="groups_student">Група:</string>
+
+    <string name="delete">Удалить</string>
+    <string name="okey">Оставить</string>
+
+    <string name="delete_student">Удалить студента ? </string>
+    <string name="delete_group">Удалить группу ? </string>
+    <string name="delete_subject">Удалить предмет ? </string>
+    <string name="title_activity_group_information">GroupInformationActivity</string>
+
+    <string name="name_kuratora_information">Имя куривныка:</string>
+    <string name="phone_number_kuratora">Номер керивныка:</string>
+    <string name="number_student_group">Количество студентов в группе:</string>
+    <string name="name_group_information">Группе:</string>
 
 
 </resources>

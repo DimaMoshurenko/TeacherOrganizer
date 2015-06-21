@@ -20,6 +20,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.example.dima.teacherorganizer.Activity.LoginActivity;
 import com.example.dima.teacherorganizer.Activity.SubjectsTeacherActivity;
 import com.example.dima.teacherorganizer.DataBase.TeacherDataBase;
@@ -32,7 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SubjectsFragment extends Fragment implements AbsListView.OnItemClickListener,
-        LoaderManager.LoaderCallbacks<Cursor> {
+        LoaderManager.LoaderCallbacks<Cursor> , AbsListView.OnItemLongClickListener {
 
     private OnFragmentInteractionListener mListener;
 
@@ -70,6 +71,7 @@ public class SubjectsFragment extends Fragment implements AbsListView.OnItemClic
         // Set the adapter
         mListView = (ListView) view.findViewById(R.id.list_subjects);
         mListView.setAdapter(mAdapter);
+        mListView.setOnItemLongClickListener(this);
         addSubject.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -79,10 +81,12 @@ public class SubjectsFragment extends Fragment implements AbsListView.OnItemClic
                 cursor.moveToLast();
                 if (LoginActivity.getIdTeacher() != null && cursor.getCount()>0) {
                     Intent myIntent = new Intent(getActivity(), SubjectRegistration.class);
-                    startActivityForResult(myIntent, 0);
+                    startActivity(myIntent);
                 } else {
                     Toast.makeText(getActivity(), "Добавте сначала группу прежде чем добавить предмет!", Toast.LENGTH_SHORT).show();
                 }
+                cursor.close();
+
             }
         });
         // Set OnItemClickListener so we can be notified on item clicks
@@ -128,6 +132,7 @@ public class SubjectsFragment extends Fragment implements AbsListView.OnItemClic
             myIntent.putExtra(SubjectsTeacherActivity.ID_SUBJECT, idSubjects);
             startActivity(myIntent);
 
+
 //            startActivityForResult(myIntent, 0);
 
             // Notify the active callbacks interface (the activity, if the
@@ -146,7 +151,7 @@ public class SubjectsFragment extends Fragment implements AbsListView.OnItemClic
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if (mAdapter == null) {
-            mAdapter = new SimpleCursorAdapter(getActivity(), R.layout.item_list_fragment, data, from, to, 0);
+            mAdapter = new SimpleCursorAdapter(getActivity(), R.layout.item_list_subjects_fragment, data, from, to, 0);
             if (mAdapter.getCount() == 0) {
 //                emptyListTextView.setVisibility(View.VISIBLE);
 //                gridView.setEmptyView(emptyListTextView);
@@ -163,6 +168,72 @@ public class SubjectsFragment extends Fragment implements AbsListView.OnItemClic
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         mAdapter.swapCursor(null);
+    }
+
+    @Override
+    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+        if (null != mListener) {
+            TextView group = (TextView) view.findViewById(R.id.teacher_subjects);
+
+            database = new TeacherDataBase(getActivity()).getWritableDatabase();
+
+            Cursor cursor = database.query(TeacherDataBase.SubjectsTable.TABLE_NAME,
+                    new String[]{TeacherDataBase.SubjectsTable.ID, TeacherDataBase.SubjectsTable.ID_TEACHER,TeacherDataBase.SubjectsTable.SUBJECT},
+                    TeacherDataBase.SubjectsTable.SUBJECT + " =  '"+group.getText().toString()+"' and "+
+                            TeacherDataBase.SubjectsTable.ID_TEACHER+" = "+LoginActivity.getIdTeacher(),null,null, null, null, null);
+
+            String idSubject = null;
+            String nameSubject = null;
+            if (cursor.moveToFirst()) {
+                do {
+                    idSubject = cursor.getString(cursor.getColumnIndex(TeacherDataBase.SubjectsTable.ID));
+                    nameSubject = cursor.getString(cursor.getColumnIndex(TeacherDataBase.SubjectsTable.SUBJECT));
+                } while (cursor.moveToNext());
+            }
+
+            final String finalIdSubject = idSubject;
+            new MaterialDialog.Builder(getActivity())
+                    .title(R.string.delete_group)
+                    .content(nameSubject)
+                    .positiveText(R.string.delete)
+                    .negativeText(R.string.okey)
+                    .callback(new MaterialDialog.ButtonCallback() {
+                        @Override
+                        public void onPositive(MaterialDialog dialog) {
+                            try {
+
+                                database.delete(TeacherDataBase.SubjectsTable.TABLE_NAME,
+                                        TeacherDataBase.SubjectsTable.ID+ " = ?",new String[]{finalIdSubject} );
+
+                                database.delete(TeacherDataBase.TeacherSubjectTable.TABLE_NAME,
+                                        TeacherDataBase.TeacherSubjectTable.SUBJECT_ID+ " = "+finalIdSubject+
+                                        " and "+ TeacherDataBase.TeacherSubjectTable.TEACHER_ID+" = "+LoginActivity.getIdTeacher()
+                                        ,null);
+
+
+
+                                database.delete(TeacherDataBase.ThemeTable.TABLE_NAME,
+                                        TeacherDataBase.ThemeTable.ID_SUBJECT+ " = ?",new String[]{finalIdSubject});
+                                mListView.notifyAll();
+                                mListView.deferNotifyDataSetChanged();
+                                dialog.dismiss();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            } finally {
+                                database.close();
+                                dialog.dismiss();
+                            }
+                        }
+
+                        @Override
+                        public void onNegative(MaterialDialog dialog) {
+                            dialog.dismiss();
+                        }
+                    }).show();
+
+            mListener.onFragmentInteraction(position);
+        }
+        return false;
     }
 
     public interface OnFragmentInteractionListener {

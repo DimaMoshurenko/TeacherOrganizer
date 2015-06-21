@@ -70,6 +70,10 @@ public class SubjectRegistration extends ActionBarActivity {
             @Override
             public void onClick(View v) {
                 setOnClickListenerAddSubjects(newSubject, numberSubject);
+
+                Intent intent = new Intent(SubjectRegistration.this, NavigationDrawer.class);
+                startActivity(intent);
+                finish();
             }
         });
 
@@ -102,14 +106,9 @@ public class SubjectRegistration extends ActionBarActivity {
         TeacherRegistration.NotEmptyValidator notEmptyValidator =
                 new TeacherRegistration.NotEmptyValidator(getString(R.string.not_empty_warning));
         newSubject.addValidator(notEmptyValidator);
-        if (newSubject.validate()) {
-            ContentValues subject = new ContentValues();
-            subject.put(TeacherDataBase.SubjectsTable.SUBJECT, newSubject.getText().toString());
-            subject.put(TeacherDataBase.SubjectsTable.ID_TEACHER, LoginActivity.getIdTeacher());
+        numberSubject.addValidator(notEmptyValidator);
+        if (newSubject.validate()&numberSubject.validate()) {
 
-            subject.put(TeacherDataBase.SubjectsTable.NUMBER_SUBJECT, numberSubject.getText().toString());
-            final long idSubject = database.insert(TeacherDataBase.SubjectsTable.TABLE_NAME, null, subject);
-            Log.e("TAG", "id idSubject " + idSubject);
 
             if (LoginActivity.getIdTeacher() != null) {
 
@@ -121,13 +120,20 @@ public class SubjectRegistration extends ActionBarActivity {
                         Cursor cursor = database.query(TeacherDataBase.GroupsTable.TABLE_NAME,
                                 new String[]{TeacherDataBase.GroupsTable.ID,
                                         TeacherDataBase.GroupsTable.GROUP_}, null, null, null, null, null);
-                        cursor.moveToFirst();
 
                         if (cursor.moveToFirst()) {
                             do {
                                 if (list.get(i).getNameGroup().equals(cursor.getString(
                                         cursor.getColumnIndex(TeacherDataBase.GroupsTable.GROUP_)))) {
                                     if (LoginActivity.getIdTeacher() != null) {
+                                        ContentValues subject = new ContentValues();
+                                        subject.put(TeacherDataBase.SubjectsTable.SUBJECT, newSubject.getText().toString());
+                                        subject.put(TeacherDataBase.SubjectsTable.ID_TEACHER, LoginActivity.getIdTeacher());
+
+                                        subject.put(TeacherDataBase.SubjectsTable.NUMBER_SUBJECT, numberSubject.getText().toString());
+                                        final long idSubject = database.insert(TeacherDataBase.SubjectsTable.TABLE_NAME, null, subject);
+                                        Log.e("TAG", "id idSubject " + idSubject);
+
                                         ContentValues content = new ContentValues();
                                         content.put(TeacherDataBase.TeacherSubjectTable.TEACHER_ID,
                                                 LoginActivity.getIdTeacher());
@@ -136,7 +142,7 @@ public class SubjectRegistration extends ActionBarActivity {
                                                 cursor.getColumnIndex(TeacherDataBase.GroupsTable.ID)));
                                         database.insert(TeacherDataBase.TeacherSubjectTable.TABLE_NAME, null, content);
                                         Log.e("TAG", " add TeacherSubjectTable ");
-                                        Log.i("TAG", "List groups " + String.valueOf(list.get(i).getNameGroup()) + " cursor " + cursor.getString(
+                                        Log.e("TAG", "List groups " + String.valueOf(list.get(i).getNameGroup()) + " cursor " + cursor.getString(
                                                 cursor.getColumnIndex(TeacherDataBase.GroupsTable.GROUP_)));
                                     }
                                 }
@@ -150,9 +156,11 @@ public class SubjectRegistration extends ActionBarActivity {
                 }
                 if (no) {
                     // testing
+                    Log.e("TAG"," пмвталоиталпотидл ");
                     Intent intent = new Intent(SubjectRegistration.this, NavigationDrawer.class);
                     startActivity(intent);
                     finish();
+
                 }
 
 

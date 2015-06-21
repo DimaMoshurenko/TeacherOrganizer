@@ -1,9 +1,9 @@
 package com.example.dima.teacherorganizer.Activity;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -20,10 +20,10 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.afollestad.materialdialogs.MaterialDialog;
 import com.example.dima.teacherorganizer.DataBase.TeacherDataBase;
 import com.example.dima.teacherorganizer.R;
 import com.example.dima.teacherorganizer.ThemeRegistration;
@@ -33,11 +33,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class TableActivity extends ActionBarActivity {
+public class TableActivity extends ActionBarActivity implements NumberPicker.OnValueChangeListener {
 
     private SQLiteDatabase database;
     public static final String ID_GROUP = " id group ";
     public static final String ID_SUBJECT = " id subject ";
+    public static final String NB_ABSENCE = "Нб";
+
+
     public static final String NUM_SUBJECT = " num subject ";
     private LinearLayout linearLayout;
 
@@ -234,6 +237,11 @@ public class TableActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
+        Log.e("value is", "" + newVal);
+    }
+
     private class TablesAdapter extends BaseAdapter {
 
         private final LayoutInflater inflater;
@@ -271,7 +279,6 @@ public class TableActivity extends ActionBarActivity {
             final RowTablesGrades studentInformation = listTablesInformation.get(position);
 
             Log.i("TAG", "Student name " + studentInformation.getStudentName());
-            Log.i("TAG", "size grades " + studentInformation.getGradsDataTheme().size());
 
             Log.i("TAG", "size header " + header.size());
 
@@ -282,66 +289,89 @@ public class TableActivity extends ActionBarActivity {
                 name.setText(studentInformation.getStudentName());
                 linearLayout = (LinearLayout) convertView.findViewById(R.id.info);
                 String repeatTheme = null;
+//                if (studentInformation.getGradsDataTheme()!=null) {
 
-                if (header.size() == studentInformation.getGradsDataTheme().size()) {
-                    for (int i = 0; i < header.size(); i++) {
-                        final TextView grade = new TextView(context);
-                        settingsGradsTextView(grade, 1);
+                    if (header.size()>0) {
+                        for (int i = 0; i < header.size(); i++) {
+                            final TextView grade = new TextView(context);
+                            settingsGradsTextView(grade, 1);
 
-                        if (studentInformation.getGradsDataTheme().get(i).getGrads().size() > 1) {
-                            String grads = new String();
-                            for (int j = 0; j < studentInformation.getGradsDataTheme().get(i).getGrads().size(); j++) {
-                                Log.e("TAG", String.valueOf(j) + " = "
-                                        + String.valueOf(studentInformation.getGradsDataTheme().get(i).getGrads().size() - 1));
-                                grads = grads + studentInformation.getGradsDataTheme().get(i).getGrads().get(j);
-                                if (j == studentInformation.getGradsDataTheme().get(i).getGrads().size() - 1) {
-                                    grads = grads +".";
-                                } else {
-                                    grads = grads +",";
+                            if (studentInformation.getGradsDataTheme()!=null) {
+                                if(studentInformation.getGradsDataTheme().get(i).getGrads()!=null) {
+                                    String grads = new String();
+                                    for (int j = 0; j < studentInformation.getGradsDataTheme().get(i).getGrads().size(); j++) {
+                                        Log.e("TAG", String.valueOf(j) + " = "
+                                                + String.valueOf(studentInformation.getGradsDataTheme().get(i).getGrads().size() - 1));
+                                        grads = grads + studentInformation.getGradsDataTheme().get(i).getGrads().get(j);
+                                        if (j == studentInformation.getGradsDataTheme().get(i).getGrads().size() - 1) {
+                                            grads = grads + ".";
+                                        } else {
+                                            grads = grads + ",";
+                                        }
+
+                                    }
+                                    grade.setText(grads);
+                                }else {
+                                    grade.setText(" ");
                                 }
-
+                            } else {
+                                grade.setText(" ");
                             }
-                            grade.setText(grads);
-                        } else {
-                            grade.setText(" ");
-                        }
-                        linearLayout.addView(grade);
-                        final int index = i;
-                        grade.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                final String[] grades = new String[1];
-                                new MaterialDialog.Builder(TableActivity.this)
-                                        .title("Тема: " + studentInformation.getGradsDataTheme().get(index).getThemeTitle())
-                                        .content(studentInformation.getStudentName())
-                                        .input("Оценка", null, new MaterialDialog.InputCallback() {
-                                            @Override
-                                            public void onInput(MaterialDialog dialog, CharSequence input) {
-                                                grades[0] = input.toString();
+                            linearLayout.addView(grade);
+                            final int index = i;
+
+                            grade.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+
+                                    final Dialog d = new Dialog(TableActivity.this);
+                                    d.setTitle("NumberPicker");
+                                    d.setContentView(R.layout.dialog);
+                                    Button set = (Button) d.findViewById(R.id.Set);
+                                    Button cencel = (Button) d.findViewById(R.id.cancel);
+                                    final NumberPicker picker = (NumberPicker) d.findViewById(R.id.numberPicker1);
+                                    picker.setMinValue(0);
+                                    picker.setMaxValue(12);
+                                    final String[] grads = new String[13];
+                                    Log.e("TAG", "grads " + grads.length);
+                                    grads[0] = NB_ABSENCE;
+                                    for (int i = 1; i < grads.length; i++) {
+                                        grads[i] = String.valueOf(i);
+
+                                    }
+
+                                    picker.setDisplayedValues(grads);
+                                    picker.setWrapSelectorWheel(false);
+                                    picker.setOnValueChangedListener(TableActivity.this);
+                                    set.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            Log.e("TAG", grads[picker.getValue()]);
+                                            Log.e("TAG", " picker " + String.valueOf(picker.getValue()));
+//                                        tv.setText(grads[picker.getValue()]);
+                                            if (grads[picker.getValue()] != null & !grads[picker.getValue()].isEmpty()) {
+                                                OnClickListener(studentInformation.getStudentName(), studentInformation.getGradsDataTheme().get(index).getThemeTitle(),
+                                                        grads[picker.getValue()], grade, header.get(index).getText().toString());
+                                                Log.e("TAG", " grades " + grads[picker.getValue()]);
                                             }
-                                        })
-                                        .dismissListener(
-                                                new DialogInterface.OnDismissListener() {
-                                                    @Override
-                                                    public void onDismiss(DialogInterface dialog) {
-                                                        Log.e("TAG", " on click " + grades[0]);
-                                                        Log.e("TAG", "student name " + studentInformation.getStudentName());
-//                                                    Log.e("TAG", " lessens "+String.valueOf(info.getLessens().get(index)));
+                                            d.dismiss();
+                                        }
+                                    });
+                                    cencel.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            d.dismiss();
+                                        }
+                                    });
+                                    d.show();
+//
+                                }
+                            });
+                        }
 
-                                                        if (grades[0] != null & !grades[0].isEmpty()) {
-                                                            OnClickListener(studentInformation.getStudentName(), studentInformation.getGradsDataTheme().get(index).getThemeTitle(),
-                                                                    grades[0], grade, header.get(index).getText().toString());
-                                                            Log.e("TAG", " grades " + grades[0]);
-                                                        }
-                                                    }
-                                                }
-                                        )
-                                        .show();
-                            }
-                        });
+                        }
+//                    }
 
-                    }
-                }
 
             }
             return convertView;
@@ -351,6 +381,8 @@ public class TableActivity extends ActionBarActivity {
     public class RowTablesGrades {
         private String studentName;
         private ArrayList<GradsDataTheme> themes;
+        public RowTablesGrades(){
+        }
 
         public void setGradsDataTheme(ArrayList<GradsDataTheme> themes) {
             this.themes = themes;
@@ -375,6 +407,9 @@ public class TableActivity extends ActionBarActivity {
         private String themeTitle;
         private String data;
         private ArrayList<String> grads;
+        public GradsDataTheme(){
+            grads = new ArrayList<>();
+        }
 
         public String getThemeTitle() {
             return themeTitle;
@@ -466,27 +501,41 @@ public class TableActivity extends ActionBarActivity {
                         idLessen = lessen.getString(lessen.getColumnIndex(TeacherDataBase.LessonsTable.ID));
                         if (student.moveToFirst()) {
                             idStudent = student.getString(student.getColumnIndex(TeacherDataBase.StudentTable.ID));
+                            String tableAbsence = TeacherDataBase.GradesTable.TABLE_NAME;
+                            String[] fieldsAbsence = {TeacherDataBase.GradesTable.ID, TeacherDataBase.GradesTable.ID_LESSON,
+                                    TeacherDataBase.GradesTable.ID_STUDENT, TeacherDataBase.GradesTable.MARKS};
 
-//                            String tableGrades = TeacherDataBase.GradesTable.TABLE_NAME;
-//                            String[] fieldsGrades = {TeacherDataBase.GradesTable.ID, TeacherDataBase.GradesTable.ID_STUDENT,
-//                                    TeacherDataBase.GradesTable.ID_LESSON, TeacherDataBase.GradesTable.MARKS};
-//
-//                            String whereGrades = TeacherDataBase.GradesTable.ID_LESSON + " = " + idLessen + " and " +
-//                                    TeacherDataBase.GradesTable.ID_STUDENT + " = " + idStudent + " ;";
-//
-//                            Cursor grades = database.query(tableGrades, fieldsGrades, whereGrades, null, null, null, null);
+                            String whereAbsence = TeacherDataBase.GradesTable.ID_LESSON + " = " + idLessen + " " + " and " +
+                                    TeacherDataBase.GradesTable.ID_STUDENT + " = " + idStudent + " ;";
 
-                            ContentValues content = new ContentValues();
+                            Cursor absence = database.query(tableAbsence, fieldsAbsence, whereAbsence, null, null, null, null);
+                            ArrayList absenceList = new ArrayList();
+                            if (absence.moveToFirst()) {
+                                do {
+                                    absenceList.add(absence.getString(absence.getColumnIndex(TeacherDataBase.GradesTable.MARKS)));
+                                } while (absence.moveToNext());
+                            }
+                            Boolean nb = false;
+                            for (int i = 0; i < absenceList.size(); i++) {
 
-                            content.put(TeacherDataBase.GradesTable.ID_STUDENT, idStudent);
-                            content.put(TeacherDataBase.GradesTable.ID_LESSON, idLessen);
-                            content.put(TeacherDataBase.GradesTable.MARKS, grades);
-                            database.insert(TeacherDataBase.GradesTable.TABLE_NAME, null, content);
-                            grade.setText(grades);
-                            Log.e("TAG", " student " + idStudent);
-                            Log.e("TAG", " lessens " + idLessen);
-                            Log.e("TAG", " theme " + idTheme);
-                            Log.e("TAG", " okey greds add");
+                                if (absenceList.get(i).equals(NB_ABSENCE)) {
+                                    nb = true;
+                                }
+                            }
+                            if (!nb) {
+                                ContentValues content = new ContentValues();
+                                content.put(TeacherDataBase.GradesTable.ID_STUDENT, idStudent);
+                                content.put(TeacherDataBase.GradesTable.ID_LESSON, idLessen);
+                                content.put(TeacherDataBase.GradesTable.MARKS, grades);
+                                database.insert(TeacherDataBase.GradesTable.TABLE_NAME, null, content);
+                                grade.setText(grades);
+                                Log.e("TAG", " student " + idStudent);
+                                Log.e("TAG", " lessens " + idLessen);
+                                Log.e("TAG", " theme " + idTheme);
+                                Log.e("TAG", " okey greds add");
+                            } else {
+                                Toast.makeText(getApplication(), " Студент відсутній  ", Toast.LENGTH_LONG).show();
+                            }
                         }
                     }
                     while (lessen.moveToNext());

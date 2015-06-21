@@ -1,4 +1,5 @@
 <resources>
+    <string name="app_name">Органайзер вчителя</string>
     <string name="action_settings">Налаштування</string>
     <string name="delete_db">Очистка Бази даних </string>
     <string name="title_activity_navigetion_drawer">NavigetionDrawer</string>
@@ -13,7 +14,7 @@
     <string name="new_theme"> Назва теми </string>
     <string name="number_subject"> Номер предмета </string>
     <string name="add_subject"> Додати предмет </string>
-    <string name="add_theme"> Додати темиу </string>
+    <string name="add_theme"> Додати тему </string>
 
     <string name="group_not_repeat_error_message">Такая группа не существует!</string>
     <string name="students">Студенти</string>
@@ -75,6 +76,19 @@
     <string name="phone_student">Номер телефона:</string>
     <string name="name_student">Імя:</string>
     <string name="groups_student">Група:</string>
+
+    <string name="delete">Видалити</string>
+    <string name="okey">Залишити</string>
+    <string name="delete_student">Видалити студента ?</string>
+
+    <string name="name_kuratora_information">Імя куратора:</string>
+    <string name="phone_number_kuratora">Номер куратора:</string>
+    <string name="number_student_group">Кількість студентів в групі:</string>
+    <string name="name_group_information">Група:</string>
+    <string name="other_information">Додаткова Інформація</string>
+    <string name="delete_group">Видалити групу ? </string>
+    <string name="delete_subject">Видалити предмет ? </string>
+
 
 
 </resources>
