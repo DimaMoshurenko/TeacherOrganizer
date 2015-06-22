@@ -1,4 +1,4 @@
-package com.example.dima.teacherorganizer;
+package com.example.dima.teacherorganizer.Activity;
 
 import android.content.ContentValues;
 import android.content.Intent;
@@ -6,15 +6,12 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.example.dima.teacherorganizer.Activity.LoginActivity;
-import com.example.dima.teacherorganizer.Activity.TableActivity;
-import com.example.dima.teacherorganizer.Activity.TeacherRegistration;
 import com.example.dima.teacherorganizer.DataBase.TeacherDataBase;
+import com.example.dima.teacherorganizer.R;
 import com.gc.materialdesign.views.ButtonFlat;
 import com.rengwuxian.materialedittext.MaterialEditText;
 
@@ -77,6 +74,7 @@ public class ThemeRegistration extends ActionBarActivity {
                         intent.putExtra(TableActivity.ID_SUBJECT,idSubject);
                         intent.putExtra(TableActivity.ID_GROUP,idGroup);
                         startActivity(intent);
+                        finish();
                     }
                 }
             }

@@ -26,7 +26,6 @@ import android.widget.Toast;
 
 import com.example.dima.teacherorganizer.DataBase.TeacherDataBase;
 import com.example.dima.teacherorganizer.R;
-import com.example.dima.teacherorganizer.ThemeRegistration;
 import com.gc.materialdesign.views.ButtonFlat;
 
 import java.util.ArrayList;
@@ -304,7 +303,7 @@ public class TableActivity extends ActionBarActivity implements NumberPicker.OnV
                                                 + String.valueOf(studentInformation.getGradsDataTheme().get(i).getGrads().size() - 1));
                                         grads = grads + studentInformation.getGradsDataTheme().get(i).getGrads().get(j);
                                         if (j == studentInformation.getGradsDataTheme().get(i).getGrads().size() - 1) {
-                                            grads = grads + ".";
+//                                            grads = grads + ".";
                                         } else {
                                             grads = grads + ",";
                                         }
@@ -325,7 +324,8 @@ public class TableActivity extends ActionBarActivity implements NumberPicker.OnV
                                 public void onClick(View v) {
 
                                     final Dialog d = new Dialog(TableActivity.this);
-                                    d.setTitle("NumberPicker");
+                                    d.setTitle(studentInformation.getGradsDataTheme().get(index).themeTitle);
+
                                     d.setContentView(R.layout.dialog);
                                     Button set = (Button) d.findViewById(R.id.Set);
                                     Button cencel = (Button) d.findViewById(R.id.cancel);
@@ -528,6 +528,9 @@ public class TableActivity extends ActionBarActivity implements NumberPicker.OnV
                                 content.put(TeacherDataBase.GradesTable.ID_LESSON, idLessen);
                                 content.put(TeacherDataBase.GradesTable.MARKS, grades);
                                 database.insert(TeacherDataBase.GradesTable.TABLE_NAME, null, content);
+                                if(grade.getText().toString().length()>0) {
+                                    grades = grade.getText().toString() + "," + grades;
+                                }
                                 grade.setText(grades);
                                 Log.e("TAG", " student " + idStudent);
                                 Log.e("TAG", " lessens " + idLessen);

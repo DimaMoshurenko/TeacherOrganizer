@@ -66,10 +66,10 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_group_registration">Реєстрація групи</string>
     <string name="title_activity_subject_registration">Реєстрація предмета</string>
-    <string name="title_activity_table">TableActivity</string>
-    <string name="title_activity_subjects_teacher">SubjectsTeacherActivity</string>
+    <string name="title_activity_table">Журнал</string>
+    <string name="title_activity_subjects_teacher"> </string>
     <string name="title_activity_theme_registration">Регістрація теми</string>
-    <string name="title_activity_student_information">StudentInformationActivity</string>
+    <string name="title_activity_student_information">Додаткова Інформація</string>
 
     <!-- Student information -->
     <string name="email_student">Пошта:</string>
@@ -88,7 +88,7 @@
     <string name="other_information">Додаткова Інформація</string>
     <string name="delete_group">Видалити групу ? </string>
     <string name="delete_subject">Видалити предмет ? </string>
-
+    <string name="propuski">Кількість пропусків:</string>
 
 
 </resources>

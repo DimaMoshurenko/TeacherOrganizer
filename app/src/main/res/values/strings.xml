@@ -67,11 +67,11 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="title_activity_group_registration">GroupRegistration</string>
-    <string name="title_activity_subject_registration">SubjectRegistration</string>
-    <string name="title_activity_table">TableActivity</string>
-    <string name="title_activity_subjects_teacher">SubjectsTeacherActivity</string>
-    <string name="title_activity_theme_registration">ThemeRegistration</string>
+    <string name="title_activity_group_registration">Реистрация группы</string>
+    <string name="title_activity_subject_registration">Реистрация предмета</string>
+    <string name="title_activity_table">Таблица оценок</string>
+    <string name="title_activity_subjects_teacher"> </string>
+    <string name="title_activity_theme_registration">Реистрация темы</string>
     <string name="title_activity_student_information">StudentInformationActivity</string>
 
     <!-- Student information -->
@@ -92,6 +92,7 @@
     <string name="phone_number_kuratora">Номер керивныка:</string>
     <string name="number_student_group">Количество студентов в группе:</string>
     <string name="name_group_information">Группе:</string>
+    <string name="other_information">Дополнительная Информация</string>
 
-
+<string name="propuski">Количество прогулов:</string>
 </resources>

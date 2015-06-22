@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.example.dima.teacherorganizer.Activity.TableActivity;
 import com.example.dima.teacherorganizer.DataBase.TeacherDataBase;
 import com.example.dima.teacherorganizer.R;
 
@@ -19,7 +20,7 @@ public class StudentInformationActivity extends ActionBarActivity {
 
 
     public static final String ID_STUDENT = "id student";
-    public static  String idStudent;
+    public static String idStudent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +39,7 @@ public class StudentInformationActivity extends ActionBarActivity {
         TextView email = (TextView) findViewById(R.id.information_student_email);
         TextView name = (TextView) findViewById(R.id.information_student_name);
         TextView group = (TextView) findViewById(R.id.information_student_group);
+        TextView proguluSudent = (TextView) findViewById(R.id.progulu);
         final TextView phone = (TextView) findViewById(R.id.information_student_phone);
         if (cursor.moveToFirst()) {
             do {
@@ -45,14 +47,32 @@ public class StudentInformationActivity extends ActionBarActivity {
                 name.setText(cursor.getString(cursor.getColumnIndex(TeacherDataBase.StudentTable.STUDENT_NAME)));
                 phone.setText(cursor.getString(cursor.getColumnIndex(TeacherDataBase.StudentTable.TELEPHONE_NUMBER)));
                 Cursor groupInformation = database.query(TeacherDataBase.GroupsTable.TABLE_NAME,
-                        new String[]{TeacherDataBase.GroupsTable.ID,TeacherDataBase.GroupsTable.GROUP_},
+                        new String[]{TeacherDataBase.GroupsTable.ID, TeacherDataBase.GroupsTable.GROUP_},
                         TeacherDataBase.GroupsTable.ID + " = ? ", new String[]{cursor.getString(cursor.getColumnIndex(TeacherDataBase.StudentTable._ID_GROUP))},
                         null, null, null, null);
-                if(groupInformation.moveToFirst()){
+                if (groupInformation.moveToFirst()) {
                     group.setText(groupInformation.getString(groupInformation.getColumnIndex(TeacherDataBase.GroupsTable.GROUP_)));
                 }
+                Cursor progulu = database.query(TeacherDataBase.GradesTable.TABLE_NAME,
+                        new String[]{TeacherDataBase.GradesTable.ID, TeacherDataBase.GradesTable.MARKS, TeacherDataBase.GradesTable.ID_STUDENT},
+                        TeacherDataBase.GradesTable.ID_STUDENT + " = ? ", new String[]{cursor.getString(cursor.getColumnIndex(TeacherDataBase.StudentTable.ID))},
+                        null, null, null, null);
+                int proguluStudent = 0;
+                if (progulu.moveToFirst()) {
+                    do {
+                        if (TableActivity.NB_ABSENCE.equals(progulu.getString(progulu.getColumnIndex(TeacherDataBase.GradesTable.MARKS)))) {
+                            proguluStudent++;
+                        }
+                    } while (progulu.moveToNext());
+                }
+                progulu.close();
+                if (proguluStudent > 0) {
+                    proguluStudent = proguluStudent * 2;
+                }
+                proguluSudent.setText(String.valueOf((proguluStudent)));
 
             } while (cursor.moveToNext());
+            cursor.close();
         }
         phone.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -63,7 +83,7 @@ public class StudentInformationActivity extends ActionBarActivity {
 
             }
         });
-           }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
