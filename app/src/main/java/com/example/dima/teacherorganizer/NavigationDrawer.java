@@ -82,13 +82,6 @@ setSupportActionBar(toolbar);
                 new SecondaryDrawerItem().withName(R.string.exit)
                         .withIcon(getResources().getDrawable(R.drawable.ic_exit_to_app_grey600_48dp))
 
-
-//                new SecondaryDrawerItem().withName(R.string.drawer_item_open_source)
-//                        .withIcon(FontAwesome.Icon.faw_question).setEnabled(false),
-//                new DividerDrawerItem(),
-//                new SecondaryDrawerItem().withName(R.string.drawer_item_contact)
-//                        .withIcon(FontAwesome.Icon.faw_github).withBadge("12+").withIdentifier(1)
-
         );
         navigationDrawer.withOnDrawerListener(new Drawer.OnDrawerListener() {
             @Override
@@ -209,7 +202,6 @@ setSupportActionBar(toolbar);
         if (iDrawerItem instanceof Nameable) {
 
             getSupportActionBar().setTitle(NavigationDrawer.this.getString(((Nameable) iDrawerItem).getNameRes()));
-            getSupportActionBar().setTitle(NavigationDrawer.this.getString(((Nameable) iDrawerItem).getNameRes()));
             Toast.makeText(NavigationDrawer.this, NavigationDrawer.this.getString(((Nameable) iDrawerItem).getNameRes()),
                     Toast.LENGTH_SHORT).show();
         }
@@ -229,77 +221,3 @@ setSupportActionBar(toolbar);
         }
     }
 }
-
-///**
-//     * A placeholder fragment containing a simple view.
-//     */
-//    public class PlaceholderFragment extends Fragment {
-//        /**
-//         * The fragment argument representing the section number for this
-//         * fragment.
-//         */
-//        private static final String ARG_SECTION_NUMBER = "section_number";
-//        private ListView listView;
-//        private ButtonFloat floatButton;
-//        private SQLiteDatabase database;
-//
-//        /**
-//         * Returns a new instance of this fragment for the given section
-//         * number.
-//         */
-//        public static PlaceholderFragment newInstance(int sectionNumber) {
-//            PlaceholderFragment fragment = new PlaceholderFragment();
-//            Bundle args = new Bundle();
-//            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-//            fragment.setArguments(args);
-//            return fragment;
-//        }
-//
-//        public PlaceholderFragment() {
-//        }
-//
-//        @Override
-//        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-//                                 Bundle savedInstanceState) {
-//            View rootView = inflater.inflate(R.layout.fragment_navigetion, container, false);
-//            listView = (ListView) rootView.findViewById(R.id.list_item);
-//            floatButton= (ButtonFloat) rootView.findViewById(R.id.float_button);
-//            return rootView;
-//        }
-//
-//        @Override
-//        public void onViewCreated(View view, Bundle savedInstanceState) {
-//            super.onViewCreated(view, savedInstanceState);;
-//            database = new TeacherDataBase(getActivity()).getWritableDatabase();
-//            Cursor cursor = database.query(TeacherDataBase.TeachersTable.TABLE_NAME,
-//                    new String[]{TeacherDataBase.TeachersTable.TEACHER_NAME}, null, null, null, null, null);
-//            Log.e("TAG", String.valueOf(cursor.getCount()));
-//            ArrayList<String> arrayList = new ArrayList<>();
-//            if (cursor.moveToFirst()) {
-//                do {
-//                    arrayList.add(cursor.getString(cursor.getColumnIndex(TeacherDataBase.TeachersTable.TEACHER_NAME)));
-//                } while (cursor.moveToNext());
-//            }
-//
-//
-//            ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
-//                    R.layout.item_list_fragment,R.id.name, arrayList);
-//            listView.setAdapter(adapter);
-//            floatButton.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    Intent myIntent = new Intent(getActivity(), TeacherRegistration.class);
-//                    startActivityForResult(myIntent, 1);
-//                }
-//            });
-//        }
-//
-//        @Override
-//        public void onAttach(Activity activity) {
-//            super.onAttach(activity);
-//            ((NavigationDrawer) activity).onSectionAttached(
-//                    getArguments().getInt(ARG_SECTION_NUMBER));
-//        }
-//    }
-
-//}

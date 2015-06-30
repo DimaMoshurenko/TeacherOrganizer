@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Build;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -17,6 +18,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
+import com.example.dima.teacherorganizer.DataBase.TeacherContentProvider;
 import com.example.dima.teacherorganizer.DataBase.TeacherDataBase;
 import com.example.dima.teacherorganizer.NavigationDrawer;
 import com.example.dima.teacherorganizer.R;
@@ -32,7 +34,7 @@ import static com.example.dima.teacherorganizer.Activity.TeacherRegistration.set
 
 
 public class StudentRegistration extends ActionBarActivity implements TextWatcher {
-    private SQLiteDatabase database;
+
     private ArrayAdapter<String> adapter;
     ArrayList<String> listGroups;
     private MaterialAutoCompleteTextView group;
@@ -43,7 +45,6 @@ public class StudentRegistration extends ActionBarActivity implements TextWatche
         setContentView(R.layout.activity_student_registration);
 
         listGroups = new ArrayList<>();
-//        adapter = new ArrayAdapter<>(getApplication(), R.layout.item_groups, R.id.group_auto_complete);
         final MaterialEditText name = (MaterialEditText) findViewById(R.id.new_name_student);
         final MaterialEditText middleName = (MaterialEditText) findViewById(R.id.new_middle_name_student);
         final MaterialEditText surname = (MaterialEditText) findViewById(R.id.new_surname_student);
@@ -66,8 +67,7 @@ public class StudentRegistration extends ActionBarActivity implements TextWatche
         group.setFloatingLabelTextSize(TeacherRegistration.FLOAT_LABEL_TEXT_SIZE);
 
         group.addTextChangedListener(this);
-        TeacherDataBase db = new TeacherDataBase(StudentRegistration.this);
-        database = db.getWritableDatabase();
+
         buttonFloat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -85,10 +85,16 @@ public class StudentRegistration extends ActionBarActivity implements TextWatche
                     content.put(TeacherDataBase.StudentTable.STUDENT_MAIL, mail.getText().toString());
 
                     if (group.getText().toString().length() > 0) {
-                        Cursor cursor = database.query(TeacherDataBase.GroupsTable.TABLE_NAME,
-                                new String[]{TeacherDataBase.GroupsTable.ID, TeacherDataBase.GroupsTable.GROUP_},
+
+//
+//                        Cursor cursor = database.query(TeacherDataBase.GroupsTable.TABLE_NAME,
+//                                new String[]{TeacherDataBase.GroupsTable.ID, TeacherDataBase.GroupsTable.GROUP_},
+//                                TeacherDataBase.GroupsTable.GROUP_ + " = ? ",
+//                                new String[]{group.getText().toString()}, null, null, null);
+                        Cursor cursor = getContentResolver().query(Uri.parse(TeacherContentProvider.CONTENT_URI + "/"
+                                        + TeacherDataBase.GroupsTable.TABLE_NAME), new String[]{TeacherDataBase.GroupsTable.ID, TeacherDataBase.GroupsTable.GROUP_},
                                 TeacherDataBase.GroupsTable.GROUP_ + " = ? ",
-                                new String[]{group.getText().toString()}, null, null, null);
+                                new String[]{group.getText().toString()}, null);
                         String idGroup = null;
                         boolean groupRepeat = false;
                         if (cursor.moveToFirst()) {
@@ -107,17 +113,18 @@ public class StudentRegistration extends ActionBarActivity implements TextWatche
                                 }
                             } while (cursor.moveToNext());
                         }
-
+                        cursor.close();
                         if (groupRepeat) {
                             if (idGroup != null) {
                                 try {
                                     content.put(TeacherDataBase.StudentTable._ID_GROUP, idGroup);
                                     content.put(TeacherDataBase.StudentTable._ID_TEACHER, LoginActivity.getIdTeacher());
-                                    database.insert(TeacherDataBase.StudentTable.TABLE_NAME, null, content);
-                                    Log.e("TAG","studetn registration "+ idGroup);
+
+                                    getContentResolver().insert(Uri.parse(TeacherContentProvider.CONTENT_URI + "/"
+                                            + TeacherDataBase.StudentTable.TABLE_NAME), content);
+                                    Log.e("TAG", "studetn registration " + idGroup);
                                     Intent intent = new Intent(StudentRegistration.this, NavigationDrawer.class);
                                     startActivity(intent);
-                                    database.close();
                                     finish();
                                 } catch (Exception e) {
                                     Toast.makeText(getApplication(), " Не вышло добавить студента попробуйте еще раз ", Toast.LENGTH_LONG).show();
@@ -163,13 +170,11 @@ public class StudentRegistration extends ActionBarActivity implements TextWatche
     }
 
 
-
     @Override
     public void onTextChanged(CharSequence s, int start, int before, int count) {
 
-        Cursor cursor = database.query(TeacherDataBase.GroupsTable.TABLE_NAME,
-                new String[]{TeacherDataBase.GroupsTable.ID, TeacherDataBase.GroupsTable.GROUP_},
-                null, null, null, null, null);
+        Cursor cursor = getContentResolver().query(Uri.parse(TeacherContentProvider.CONTENT_URI+"/"+TeacherDataBase.GroupsTable.TABLE_NAME),
+                new String[]{TeacherDataBase.GroupsTable.ID, TeacherDataBase.GroupsTable.GROUP_},null,null,null);
 
         int repetition = 0;
         if (cursor.moveToFirst()) {
@@ -190,14 +195,14 @@ public class StudentRegistration extends ActionBarActivity implements TextWatche
                         listGroups.add(cursor.getString(cursor.getColumnIndex(TeacherDataBase.GroupsTable.GROUP_)));
                     }
 
-
                 }
             } while (cursor.moveToNext());
         }
+        cursor.close();
         Collections.sort(listGroups);
         adapter = new ArrayAdapter<>(StudentRegistration.this, R.layout.item_groups, R.id.group_auto_complete, listGroups);
         group.setAdapter(adapter);
-        cursor.close();
+
     }
 
     @Override

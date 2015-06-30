@@ -4,12 +4,14 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.example.dima.teacherorganizer.DataBase.TeacherContentProvider;
 import com.example.dima.teacherorganizer.DataBase.TeacherDataBase;
 import com.example.dima.teacherorganizer.R;
 import com.gc.materialdesign.views.ButtonFlat;
@@ -25,14 +27,12 @@ import static com.example.dima.teacherorganizer.Activity.TeacherRegistration.set
 
 public class ThemeRegistration extends ActionBarActivity {
 
-    private SQLiteDatabase database;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_theme_registration);
 
-        database = new TeacherDataBase(this).getWritableDatabase();
+
         final MaterialEditText newTheme = (MaterialEditText) findViewById(R.id.new_theme);
         ButtonFlat addSubject = (ButtonFlat) findViewById(R.id.add_theme);
         setSettingMaterialEditText(newTheme, getResources().getString(R.string.new_theme), this);
@@ -46,33 +46,37 @@ public class ThemeRegistration extends ActionBarActivity {
                     String idGroup = getIntent().getStringExtra(TableActivity.ID_GROUP);
                     String idSubject = getIntent().getStringExtra(TableActivity.ID_SUBJECT);
                     if (idGroup != null & idSubject != null) {
-                        String numSubject = null;
-                        Cursor groupCursor = database.query(TeacherDataBase.SubjectsTable.TABLE_NAME,
-                                new String[]{TeacherDataBase.SubjectsTable.ID,
-                                        TeacherDataBase.SubjectsTable.NUMBER_SUBJECT, TeacherDataBase.SubjectsTable.ID_TEACHER},
-                                TeacherDataBase.SubjectsTable.ID_TEACHER + " = " + LoginActivity.getIdTeacher() + " and " +
-                                        TeacherDataBase.SubjectsTable.ID + " = " + idSubject + " ;",
-                                null, null, null, null);
-                        if (groupCursor.moveToFirst()) {
-                            numSubject = groupCursor.getString(groupCursor.getColumnIndex(TeacherDataBase.SubjectsTable.NUMBER_SUBJECT));
-                        }
+//                        String numSubject = null;
+                        Cursor groupCursor = getContentResolver().query(Uri.parse(TeacherContentProvider.CONTENT_URI+"/"+
+                                TeacherDataBase.SubjectsTable.TABLE_NAME),new String[]{TeacherDataBase.SubjectsTable.ID,
+                                TeacherDataBase.SubjectsTable.NUMBER_SUBJECT, TeacherDataBase.SubjectsTable.ID_TEACHER},
+                        TeacherDataBase.SubjectsTable.ID_TEACHER + " = " + LoginActivity.getIdTeacher() + " and " +
+                                TeacherDataBase.SubjectsTable.ID + " = " + idSubject + " ;",
+                                null, null);
+
+//                        if (groupCursor.moveToFirst()) {
+//                            numSubject = groupCursor.getString(groupCursor.getColumnIndex(TeacherDataBase.SubjectsTable.NUMBER_SUBJECT));
+//                        }
                         ContentValues theme = new ContentValues();
                         theme.put(TeacherDataBase.ThemeTable.ID_GROUP, idGroup);
                         theme.put(TeacherDataBase.ThemeTable.ID_SUBJECT, idSubject);
                         theme.put(TeacherDataBase.ThemeTable.TITLE, newTheme.getText().toString());
-                        long idTheme = database.insert(TeacherDataBase.ThemeTable.TABLE_NAME, null, theme);
+                        Uri uri =getContentResolver().insert(Uri.parse(TeacherContentProvider.CONTENT_URI + "/" +
+                                TeacherDataBase.ThemeTable.TABLE_NAME), theme);
+                        long idTheme =Integer.valueOf(uri.getLastPathSegment());
 
                         ContentValues lessens = new ContentValues();
-                        lessens.put(TeacherDataBase.LessonsTable._ID_GROUP,idGroup);
-                        lessens.put(TeacherDataBase.LessonsTable._ID_TEACHER,LoginActivity.getIdTeacher());
+                        lessens.put(TeacherDataBase.LessonsTable._ID_GROUP, idGroup);
+                        lessens.put(TeacherDataBase.LessonsTable._ID_TEACHER, LoginActivity.getIdTeacher());
                         lessens.put(TeacherDataBase.LessonsTable._ID_THEME, idTheme);
                         DateFormat dateFormat = new SimpleDateFormat("MM/dd/yy");
                         String date = dateFormat.format(new Date());
-                        lessens.put(TeacherDataBase.LessonsTable.DATE_,date);
-                        database.insert(TeacherDataBase.LessonsTable.TABLE_NAME,null,lessens);
-                        Intent intent = new Intent(ThemeRegistration.this,TableActivity.class);
-                        intent.putExtra(TableActivity.ID_SUBJECT,idSubject);
-                        intent.putExtra(TableActivity.ID_GROUP,idGroup);
+                        lessens.put(TeacherDataBase.LessonsTable.DATE_, date);
+                        getContentResolver().insert(Uri.parse(TeacherContentProvider.CONTENT_URI+"/"
+                                +TeacherDataBase.LessonsTable.TABLE_NAME),lessens);
+                        Intent intent = new Intent(ThemeRegistration.this, TableActivity.class);
+                        intent.putExtra(TableActivity.ID_SUBJECT, idSubject);
+                        intent.putExtra(TableActivity.ID_GROUP, idGroup);
                         startActivity(intent);
                         finish();
                     }

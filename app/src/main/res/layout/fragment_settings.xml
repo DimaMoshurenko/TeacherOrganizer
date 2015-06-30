@@ -13,4 +13,11 @@
         android:layout_alignWithParentIfMissing="false"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true" />
+
+    <com.gc.materialdesign.views.ButtonFlat
+        android:layout_width="300dp"
+        android:layout_height="70dp"
+        android:id="@+id/example"
+        android:text="Example"
+        android:layout_gravity="left|center_vertical" />
 </FrameLayout>

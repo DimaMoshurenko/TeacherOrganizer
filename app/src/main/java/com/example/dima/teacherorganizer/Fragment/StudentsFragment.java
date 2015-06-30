@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -27,6 +28,7 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.example.dima.teacherorganizer.Activity.LoginActivity;
 import com.example.dima.teacherorganizer.Activity.SubjectRegistration;
 import com.example.dima.teacherorganizer.Activity.SubjectsTeacherActivity;
+import com.example.dima.teacherorganizer.DataBase.TeacherContentProvider;
 import com.example.dima.teacherorganizer.DataBase.TeacherDataBase;
 import com.example.dima.teacherorganizer.InformatoinActivity.GroupInformationActivity;
 import com.example.dima.teacherorganizer.InformatoinActivity.StudentInformationActivity;
@@ -40,7 +42,6 @@ public class StudentsFragment extends Fragment implements AbsListView.OnItemClic
     private OnFragmentInteractionListener mListener;
     private ListView mListView;
     private SimpleCursorAdapter mAdapter;
-    private SQLiteDatabase database;
     private int[] to;
     private String[] from;
     private ButtonFloat addTeacher;
@@ -71,21 +72,21 @@ public class StudentsFragment extends Fragment implements AbsListView.OnItemClic
             case R.id.action_settings:
                 return true;
             case R.id.delete_db:
-                TeacherDataBase db = new TeacherDataBase(getActivity());
-                database = db.getWritableDatabase();
-
-                database.delete(TeacherDataBase.SubjectsTable.TABLE_NAME, null, null);
-                database.delete(TeacherDataBase.GroupsTable.TABLE_NAME, null, null);
-                database.delete(TeacherDataBase.LessonsTable.TABLE_NAME, null, null);
-                database.delete(TeacherDataBase.GradesTable.TABLE_NAME, null, null);
-                database.delete(TeacherDataBase.TeacherSubjectTable.TABLE_NAME, null, null);
-                database.delete(TeacherDataBase.ThemeTable.TABLE_NAME, null, null);
-                database.delete(TeacherDataBase.TeachersTable.TABLE_NAME, null, null);
-                database.delete(TeacherDataBase.StudentTable.TABLE_NAME, null, null);
-
-                Log.e("TAg", " clearn " + LoginActivity.getIdTeacher());
-                Intent intent = new Intent(getActivity(), LoginActivity.class);
-                startActivity(intent);
+//                TeacherDataBase db = new TeacherDataBase(getActivity());
+//                database = db.getWritableDatabase();
+//
+//                database.delete(TeacherDataBase.SubjectsTable.TABLE_NAME, null, null);
+//                database.delete(TeacherDataBase.GroupsTable.TABLE_NAME, null, null);
+//                database.delete(TeacherDataBase.LessonsTable.TABLE_NAME, null, null);
+//                database.delete(TeacherDataBase.GradesTable.TABLE_NAME, null, null);
+//                database.delete(TeacherDataBase.TeacherSubjectTable.TABLE_NAME, null, null);
+//                database.delete(TeacherDataBase.ThemeTable.TABLE_NAME, null, null);
+//                database.delete(TeacherDataBase.TeachersTable.TABLE_NAME, null, null);
+//                database.delete(TeacherDataBase.StudentTable.TABLE_NAME, null, null);
+//
+//                Log.e("TAg", " clearn " + LoginActivity.getIdTeacher());
+//                Intent intent = new Intent(getActivity(), LoginActivity.class);
+//                startActivity(intent);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -124,19 +125,14 @@ public class StudentsFragment extends Fragment implements AbsListView.OnItemClic
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        database = new TeacherDataBase(getActivity()).getWritableDatabase();
         if (LoginActivity.getIdTeacher() != null) {
-            Cursor cursor = database.query(TeacherDataBase.StudentTable.TABLE_NAME,
-                    new String[]{TeacherDataBase.StudentTable.ID, TeacherDataBase.StudentTable.STUDENT_NAME},
+            Cursor cursor = getActivity().getContentResolver().query(Uri.parse(TeacherContentProvider.CONTENT_URI + "/" +
+                            TeacherDataBase.StudentTable.TABLE_NAME), new String[]{TeacherDataBase.StudentTable.ID, TeacherDataBase.StudentTable.STUDENT_NAME},
                     TeacherDataBase.StudentTable._ID_TEACHER + " = ? ", new String[]{LoginActivity.getIdTeacher()},
-                    null, null, null);
+                    null, null);
             mAdapter = new SimpleCursorAdapter(getActivity(), R.layout.item_list_fragment, cursor, from, to, 0);
             mListView.setAdapter(mAdapter);
-
-
         }
-
-
         // Set OnItemClickListener so we can be notified on item clicks
         mListView.setOnItemClickListener(this);
         mListView.setOnItemLongClickListener(this);
@@ -145,9 +141,10 @@ public class StudentsFragment extends Fragment implements AbsListView.OnItemClic
         addTeacher.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Cursor cursor = database.query(TeacherDataBase.SubjectsTable.TABLE_NAME,
-                        new String[]{TeacherDataBase.SubjectsTable.ID, TeacherDataBase.SubjectsTable.ID_TEACHER},
-                        TeacherDataBase.SubjectsTable.ID_TEACHER + " = ? ", new String[]{LoginActivity.getIdTeacher()}, null, null, null, null);
+                Cursor cursor = getActivity().getContentResolver().query(Uri.parse(TeacherContentProvider.CONTENT_URI + "/" +
+                                TeacherDataBase.SubjectsTable.TABLE_NAME), new String[]{TeacherDataBase.StudentTable.ID, TeacherDataBase.StudentTable.STUDENT_NAME},
+                        TeacherDataBase.StudentTable._ID_TEACHER + " = ? ", new String[]{LoginActivity.getIdTeacher()},
+                        null, null);
                 cursor.moveToLast();
 //                Log.e("TAG", "  cursor " + !cursor.isNull(cursor.getColumnIndex(TeacherDataBase.SubjectsTable.ID)));
                 if (LoginActivity.getIdTeacher() != null && cursor.getCount() > 0) {
@@ -156,6 +153,7 @@ public class StudentsFragment extends Fragment implements AbsListView.OnItemClic
                 } else {
                     Toast.makeText(getActivity(), "Добавте сначала предмет прежде чем добавить Сдентов !", Toast.LENGTH_SHORT).show();
                 }
+                cursor.close();
 
             }
         });
@@ -183,19 +181,18 @@ public class StudentsFragment extends Fragment implements AbsListView.OnItemClic
         if (null != mListener) {
             TextView student = (TextView) view.findViewById(R.id.other_name);
             Log.e("TAG", "student " + String.valueOf(student.getText()));
-            database = new TeacherDataBase(getActivity()).getWritableDatabase();
             Intent myIntent = new Intent(getActivity(), StudentInformationActivity.class);
-            Cursor cursor = database.query(TeacherDataBase.StudentTable.TABLE_NAME,
-                    new String[]{TeacherDataBase.StudentTable.STUDENT_NAME, TeacherDataBase.StudentTable.ID},
+            Cursor cursor = getActivity().getContentResolver().query(Uri.parse(TeacherContentProvider.CONTENT_URI + "/" +
+                            TeacherDataBase.StudentTable.TABLE_NAME), new String[]{TeacherDataBase.StudentTable.STUDENT_NAME, TeacherDataBase.StudentTable.ID},
                     TeacherDataBase.StudentTable.STUDENT_NAME + " = ? ", new String[]{student.getText().toString()},
-                    null, null, null, null);
+                    null, null);
             String idStudent = null;
             if (cursor.moveToFirst()) {
                 do {
                     idStudent = cursor.getString(cursor.getColumnIndex(TeacherDataBase.StudentTable.ID));
                 } while (cursor.moveToNext());
             }
-
+            cursor.close();
             myIntent.putExtra(StudentInformationActivity.ID_STUDENT, idStudent);
             startActivity(myIntent);
             mListener.onFragmentInteraction("OK");
@@ -205,7 +202,9 @@ public class StudentsFragment extends Fragment implements AbsListView.OnItemClic
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         String[] projection = {TeacherDataBase.StudentTable.STUDENT_NAME};
-        return new CursorLoader(getActivity(), null, projection, null, null, null);
+        return new CursorLoader(getActivity(),
+                Uri.parse(TeacherContentProvider.CONTENT_URI + "/" + TeacherDataBase.StudentTable.TABLE_NAME),
+                projection, null, null, null);
 //        TeacherDataBase.TeachersTable.ID,
     }
 
@@ -237,13 +236,10 @@ public class StudentsFragment extends Fragment implements AbsListView.OnItemClic
     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
         if (null != mListener) {
             TextView student = (TextView) view.findViewById(R.id.other_name);
-
-            database = new TeacherDataBase(getActivity()).getWritableDatabase();
-
-            Cursor cursor = database.query(TeacherDataBase.StudentTable.TABLE_NAME,
-                    new String[]{TeacherDataBase.StudentTable.STUDENT_NAME, TeacherDataBase.StudentTable.ID},
+            Cursor cursor = getActivity().getContentResolver().query(Uri.parse(TeacherContentProvider.CONTENT_URI + "/" +
+                            TeacherDataBase.StudentTable.TABLE_NAME), new String[]{TeacherDataBase.StudentTable.STUDENT_NAME, TeacherDataBase.StudentTable.ID},
                     TeacherDataBase.StudentTable.STUDENT_NAME + " = ? ", new String[]{student.getText().toString()},
-                    null, null, null, null);
+                    null, null);
             String idStudent = null;
             String nameStudent = null;
             if (cursor.moveToFirst()) {
@@ -252,7 +248,7 @@ public class StudentsFragment extends Fragment implements AbsListView.OnItemClic
                     nameStudent = cursor.getString(cursor.getColumnIndex(TeacherDataBase.StudentTable.STUDENT_NAME));
                 } while (cursor.moveToNext());
             }
-
+            cursor.close();
             final String finalIdStudent = idStudent;
             new MaterialDialog.Builder(getActivity())
                     .title(R.string.delete_student)
@@ -263,15 +259,18 @@ public class StudentsFragment extends Fragment implements AbsListView.OnItemClic
                         @Override
                         public void onPositive(MaterialDialog dialog) {
                             try {
-                                database.delete(TeacherDataBase.StudentTable.TABLE_NAME,
-                                        TeacherDataBase.StudentTable.ID+ " = ?",new String[]{finalIdStudent} );
-                                database.delete(TeacherDataBase.GradesTable.TABLE_NAME,
-                                        TeacherDataBase.GradesTable.ID_STUDENT+ " = ?",new String[]{finalIdStudent});
+                                getActivity().getContentResolver().delete(Uri.parse(TeacherContentProvider.CONTENT_URI + "/" +
+                                                TeacherDataBase.StudentTable.TABLE_NAME),
+                                        TeacherDataBase.StudentTable.ID + " = ?", new String[]{finalIdStudent} );
+
+                                getActivity().getContentResolver().delete(Uri.parse(TeacherContentProvider.CONTENT_URI + "/" +
+                                                TeacherDataBase.GradesTable.TABLE_NAME),
+                                        TeacherDataBase.GradesTable.ID_STUDENT + " = ?", new String[]{finalIdStudent});
+
                                 mListView.notifyAll();
                             } catch (Exception e) {
                                 e.printStackTrace();
                             } finally {
-                                database.close();
                                 dialog.dismiss();
                             }
                         }

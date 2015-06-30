@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
@@ -13,6 +14,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.example.dima.teacherorganizer.DataBase.TeacherContentProvider;
 import com.example.dima.teacherorganizer.DataBase.TeacherDataBase;
 import com.example.dima.teacherorganizer.NavigationDrawer;
 import com.example.dima.teacherorganizer.R;
@@ -25,7 +27,6 @@ import com.rengwuxian.materialedittext.validation.RegexpValidator;
 public class TeacherRegistration extends ActionBarActivity {
     public static final int FLOAT_LABEL_TEXT_SIZE = 20;
     public static final int FLOAT_LABEL = 2;
-    private SQLiteDatabase database;
     private ButtonFlat addTeacher;
 
     public static class NotEmptyValidator extends METValidator {
@@ -87,27 +88,22 @@ public class TeacherRegistration extends ActionBarActivity {
                         password.validateWith(validator);
                         passwordRepeat.validateWith(validator);
                     } else {
-                        TeacherDataBase db = new TeacherDataBase(TeacherRegistration.this);
-                        database = db.getWritableDatabase();
 
-                        if (!isValidationLogin(login.getText().toString(), database)) {
+
+                        if (!isValidationLogin(login.getText().toString(), TeacherRegistration.this)) {
                             ContentValues contentValues = new ContentValues();
                             contentValues.put(TeacherDataBase.TeachersTable.TEACHER_NAME, surname.getText().toString() + " "
                                     + teacherName.getText().toString() + " " + middleName.getText().toString());
                             contentValues.put(TeacherDataBase.TeachersTable.LOGIN, login.getText().toString());
                             contentValues.put(TeacherDataBase.TeachersTable.PASSWORD, password.getText().toString());
-                            long idTeacher = database.insert(TeacherDataBase.TeachersTable.TABLE_NAME, null, contentValues);
+                            Uri uri = getContentResolver().insert(Uri.parse(TeacherContentProvider.CONTENT_URI + "/"
+                                    + TeacherDataBase.TeachersTable.TABLE_NAME), contentValues);
+                            int idTeacher = Integer.valueOf(uri.getLastPathSegment());
                             Log.e("TAG", "id teacher " + String.valueOf(idTeacher));
-//                            getPreferences(MODE_PRIVATE);
-//                            SharedPreferences shares = getSharedPreferences(ID_ALL_TABLES, MODE_PRIVATE);
-//                            SharedPreferences.Editor editor =shares.edit();
-//                            editor.putLong(TeacherDataBase.TeachersTable.TABLE_NAME,idTeacher);
-//                            editor.commit();
-                            Log.e("TAG", " add new teacher ");
+//
                             Intent intent = new Intent(TeacherRegistration.this, LoginActivity.class);
                             intent.putExtra(TeacherDataBase.TeachersTable.ID, idTeacher);
                             startActivity(intent);
-                            database.close();
                             finish();
                         } else {
                             login.validateWith(validatorLogin);
@@ -143,13 +139,12 @@ public class TeacherRegistration extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public static boolean isValidationLogin(final String login, final SQLiteDatabase database) {
+    public static boolean isValidationLogin(final String login, Context context) {
         boolean result = false;
-        final SQLiteDatabase finalDb = database;
+        Cursor cursor = context.getContentResolver().query(Uri.parse(TeacherContentProvider.CONTENT_URI + "/" + TeacherDataBase.TeachersTable.TABLE_NAME),
+                new String[]{TeacherDataBase.TeachersTable.LOGIN}, null,
+                null, null);
 
-        Cursor cursor = finalDb.query(TeacherDataBase.TeachersTable.TABLE_NAME,
-                new String[]{TeacherDataBase.TeachersTable.LOGIN},
-                null, null, null, null, null);
         if (cursor.moveToFirst()) {
             do {
                 String loginCursor = cursor.getString(cursor.getColumnIndex(TeacherDataBase.TeachersTable.LOGIN));

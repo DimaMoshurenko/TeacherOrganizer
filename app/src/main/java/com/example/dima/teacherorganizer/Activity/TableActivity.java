@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -24,6 +25,7 @@ import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.dima.teacherorganizer.DataBase.TeacherContentProvider;
 import com.example.dima.teacherorganizer.DataBase.TeacherDataBase;
 import com.example.dima.teacherorganizer.R;
 import com.gc.materialdesign.views.ButtonFlat;
@@ -34,7 +36,6 @@ import java.util.Random;
 
 public class TableActivity extends ActionBarActivity implements NumberPicker.OnValueChangeListener {
 
-    private SQLiteDatabase database;
     public static final String ID_GROUP = " id group ";
     public static final String ID_SUBJECT = " id subject ";
     public static final String NB_ABSENCE = "Нб";
@@ -52,7 +53,7 @@ public class TableActivity extends ActionBarActivity implements NumberPicker.OnV
         setContentView(R.layout.activity_table_grade);
         ButtonFlat how = (ButtonFlat) findViewById(R.id.how);
         linearLayout = (LinearLayout) findViewById(R.id.header);
-        database = new TeacherDataBase(TableActivity.this).getWritableDatabase();
+
 
         String tableStudents = TeacherDataBase.StudentTable.TABLE_NAME;
         String[] fieldsStudents = {TeacherDataBase.StudentTable.ID, TeacherDataBase.StudentTable._ID_TEACHER,
@@ -60,7 +61,9 @@ public class TableActivity extends ActionBarActivity implements NumberPicker.OnV
 
         String whereStudents = TeacherDataBase.StudentTable._ID_GROUP + " = " + getIntent().getStringExtra(ID_GROUP) + " and " +
                 TeacherDataBase.StudentTable._ID_TEACHER + " = " + LoginActivity.getIdTeacher() + "  ;";
-        Cursor students = database.query(tableStudents, fieldsStudents, whereStudents, null, null, null, null);
+
+        Cursor students = getContentResolver().query(Uri.parse(TeacherContentProvider.CONTENT_URI + "/"
+                + tableStudents), fieldsStudents, whereStudents, null, null);
 
         String tableThemes = TeacherDataBase.ThemeTable.TABLE_NAME;
         String[] fieldsThemes = {TeacherDataBase.ThemeTable.ID, TeacherDataBase.ThemeTable.ID_SUBJECT,
@@ -68,23 +71,20 @@ public class TableActivity extends ActionBarActivity implements NumberPicker.OnV
         String whereThemes = TeacherDataBase.ThemeTable.ID_SUBJECT + " = " + getIntent().getStringExtra(ID_SUBJECT) + " and " +
                 TeacherDataBase.ThemeTable.ID_GROUP + " = " + getIntent().getStringExtra(ID_GROUP) + "  ";
 
-        Cursor themes = database.query(tableThemes, fieldsThemes, whereThemes, null, null, null, null);
-        // длинна шапки будет зависить от количества тем
+        Cursor themes = getContentResolver().query(Uri.parse(TeacherContentProvider.CONTENT_URI + "/"
+                + tableThemes), fieldsThemes, whereThemes, null, null);
+
+        // длинна шапки зависит от количества тем
 
         final ArrayList<RowTablesGrades> listTablesInformation = new ArrayList<>();
         RowTablesGrades information;
-        Cursor lessens = null;
-        if (students.moveToFirst())
+        if (students.moveToFirst()) {
             do {
                 information = new RowTablesGrades();
                 information.setStudentName(students.getString(students.getColumnIndex(TeacherDataBase.StudentTable.STUDENT_NAME)));
                 ArrayList<GradsDataTheme> listThemes = new ArrayList<>();
-//                Log.e("TAG", " ok  student " + students.getString(students.getColumnIndex(TeacherDataBase.StudentTable.STUDENT_NAME)));
-//                Log.e("TAG", " themes " + String.valueOf(themes.getCount()));
                 if (themes.moveToFirst()) {
-
                     do {
-
                         GradsDataTheme gradsThemeData = new GradsDataTheme();
                         // количество тем это количесво колонок не обезательно заполненых
                         gradsThemeData.setThemeTitle(themes.getString(themes.getColumnIndex(TeacherDataBase.ThemeTable.TITLE)));
@@ -98,7 +98,8 @@ public class TableActivity extends ActionBarActivity implements NumberPicker.OnV
                                 themes.getString(themes.getColumnIndex(TeacherDataBase.ThemeTable.ID)) + " " + " and " +
                                 TeacherDataBase.LessonsTable._ID_GROUP + " = " + getIntent().getStringExtra(ID_GROUP) + "  and " +
                                 TeacherDataBase.LessonsTable._ID_TEACHER + " = " + LoginActivity.getIdTeacher() + " ;";
-                        lessens = database.query(tableLessens, fieldsLessens, whereLessens, null, null, null, null);
+                        Cursor lessens = getContentResolver().query(Uri.parse(TeacherContentProvider.CONTENT_URI + "/"
+                                + tableLessens), fieldsLessens, whereLessens, null, null);
                         ArrayList<String> grads = new ArrayList<>();
                         if (lessens.moveToFirst()) {
                             do {
@@ -111,35 +112,32 @@ public class TableActivity extends ActionBarActivity implements NumberPicker.OnV
                                         lessens.getString(lessens.getColumnIndex(TeacherDataBase.LessonsTable.ID)) + " and " +
                                         TeacherDataBase.GradesTable.ID_STUDENT + " = " +
                                         students.getString(students.getColumnIndex(TeacherDataBase.StudentTable.ID)) + " ;";
-
-                                Cursor grades = database.query(tableGrades, fieldsGrades, whereGrades, null, null, null, null);
-
-
+                                Cursor grades = getContentResolver().query(Uri.parse(TeacherContentProvider.CONTENT_URI + "/"
+                                        + tableGrades), fieldsGrades, whereGrades, null, null);
                                 if (grades.moveToFirst()) {
                                     do {
-//                                        Log.i("TAG", students.getString(students.getColumnIndex(TeacherDataBase.StudentTable.STUDENT_NAME)));
-//                                        Log.i("TAG", "grade " + grades.getString(grades.getColumnIndex(TeacherDataBase.GradesTable.MARKS)));
-//                                        Log.i("TAG", "theme " + themes.getString(themes.getColumnIndex(TeacherDataBase.ThemeTable.TITLE)));
                                         grads.add(grades.getString(grades.getColumnIndex(TeacherDataBase.GradesTable.MARKS)));
-
                                     } while (grades.moveToNext());
                                 } else {
                                     grads.add("");
                                 }
-
+                                grades.close();
                                 Log.e("TAG", "size " + String.valueOf(grads.size()));
                                 gradsThemeData.setGrads(grads);
                             } while (lessens.moveToNext());
                         }
+                        lessens.close();
                         listThemes.add(gradsThemeData);
                     } while (themes.moveToNext());
                     information.setGradsDataTheme(listThemes);
                 }
-//                themes.close();
+                themes.close();
 
                 listTablesInformation.add(information);
             } while (students.moveToNext());
+        }
         ArrayList<TextView> header = new ArrayList<>();
+        students.close();
         if (themes.moveToFirst()) {
             do {
                 String tableLessens = TeacherDataBase.LessonsTable.TABLE_NAME;
@@ -152,7 +150,9 @@ public class TableActivity extends ActionBarActivity implements NumberPicker.OnV
                         TeacherDataBase.LessonsTable._ID_GROUP + " = " + getIntent().getStringExtra(ID_GROUP) + "  and " +
                         TeacherDataBase.LessonsTable._ID_TEACHER + " = " + LoginActivity.getIdTeacher() + " ;";
 
-                lessens = database.query(tableLessens, fieldsLessens, whereLessens, null, null, null, null);
+                Cursor lessens = getContentResolver().query(Uri.parse(TeacherContentProvider.CONTENT_URI + "/"
+                        + tableLessens), fieldsLessens, whereLessens, null, null);
+
                 if (lessens.moveToFirst()) {
                     ArrayList<String> lessensList = new ArrayList<>();
                     do {
@@ -164,6 +164,7 @@ public class TableActivity extends ActionBarActivity implements NumberPicker.OnV
                         header.add(data);
                     } while (lessens.moveToNext());
                 }
+                lessens.close();
             } while (themes.moveToNext());
         }
 
@@ -287,89 +288,89 @@ public class TableActivity extends ActionBarActivity implements NumberPicker.OnV
                 final TextView name = (TextView) convertView.findViewById(R.id.name_student_grade);
                 name.setText(studentInformation.getStudentName());
                 linearLayout = (LinearLayout) convertView.findViewById(R.id.info);
-                String repeatTheme = null;
+//                String repeatTheme = null;
 //                if (studentInformation.getGradsDataTheme()!=null) {
 
-                    if (header.size()>0) {
-                        for (int i = 0; i < header.size(); i++) {
-                            final TextView grade = new TextView(context);
-                            settingsGradsTextView(grade, 1);
+                if (header.size() > 0) {
+                    for (int i = 0; i < header.size(); i++) {
+                        final TextView grade = new TextView(context);
+                        settingsGradsTextView(grade, 1);
 
-                            if (studentInformation.getGradsDataTheme()!=null) {
-                                if(studentInformation.getGradsDataTheme().get(i).getGrads()!=null) {
-                                    String grads = new String();
-                                    for (int j = 0; j < studentInformation.getGradsDataTheme().get(i).getGrads().size(); j++) {
-                                        Log.e("TAG", String.valueOf(j) + " = "
-                                                + String.valueOf(studentInformation.getGradsDataTheme().get(i).getGrads().size() - 1));
-                                        grads = grads + studentInformation.getGradsDataTheme().get(i).getGrads().get(j);
-                                        if (j == studentInformation.getGradsDataTheme().get(i).getGrads().size() - 1) {
+                        if (studentInformation.getGradsDataTheme() != null) {
+                            if (studentInformation.getGradsDataTheme().get(i).getGrads() != null) {
+                                String grads = new String();
+                                for (int j = 0; j < studentInformation.getGradsDataTheme().get(i).getGrads().size(); j++) {
+                                    Log.e("TAG", String.valueOf(j) + " = "
+                                            + String.valueOf(studentInformation.getGradsDataTheme().get(i).getGrads().size() - 1));
+                                    grads = grads + studentInformation.getGradsDataTheme().get(i).getGrads().get(j);
+                                    if (j == studentInformation.getGradsDataTheme().get(i).getGrads().size() - 1) {
 //                                            grads = grads + ".";
-                                        } else {
-                                            grads = grads + ",";
-                                        }
-
+                                    } else {
+                                        grads = grads + ",";
                                     }
-                                    grade.setText(grads);
-                                }else {
-                                    grade.setText(" ");
+
                                 }
+                                grade.setText(grads);
                             } else {
                                 grade.setText(" ");
                             }
-                            linearLayout.addView(grade);
-                            final int index = i;
+                        } else {
+                            grade.setText(" ");
+                        }
+                        linearLayout.addView(grade);
+                        final int index = i;
 
-                            grade.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
+                        grade.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
 
-                                    final Dialog d = new Dialog(TableActivity.this);
-                                    d.setTitle(studentInformation.getGradsDataTheme().get(index).themeTitle);
+                                final Dialog d = new Dialog(TableActivity.this);
+                                d.setTitle(studentInformation.getGradsDataTheme().get(index).themeTitle);
 
-                                    d.setContentView(R.layout.dialog);
-                                    Button set = (Button) d.findViewById(R.id.Set);
-                                    Button cencel = (Button) d.findViewById(R.id.cancel);
-                                    final NumberPicker picker = (NumberPicker) d.findViewById(R.id.numberPicker1);
-                                    picker.setMinValue(0);
-                                    picker.setMaxValue(12);
-                                    final String[] grads = new String[13];
-                                    Log.e("TAG", "grads " + grads.length);
-                                    grads[0] = NB_ABSENCE;
-                                    for (int i = 1; i < grads.length; i++) {
-                                        grads[i] = String.valueOf(i);
+                                d.setContentView(R.layout.dialog);
+                                Button set = (Button) d.findViewById(R.id.Set);
+                                Button cancel = (Button) d.findViewById(R.id.cancel);
+                                final NumberPicker picker = (NumberPicker) d.findViewById(R.id.numberPicker1);
+                                picker.setMinValue(0);
+                                picker.setMaxValue(12);
+                                final String[] grads = new String[13];
+                                Log.e("TAG", "grads " + grads.length);
+                                grads[0] = NB_ABSENCE;
+                                for (int i = 1; i < grads.length; i++) {
+                                    grads[i] = String.valueOf(i);
 
-                                    }
-
-                                    picker.setDisplayedValues(grads);
-                                    picker.setWrapSelectorWheel(false);
-                                    picker.setOnValueChangedListener(TableActivity.this);
-                                    set.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            Log.e("TAG", grads[picker.getValue()]);
-                                            Log.e("TAG", " picker " + String.valueOf(picker.getValue()));
-//                                        tv.setText(grads[picker.getValue()]);
-                                            if (grads[picker.getValue()] != null & !grads[picker.getValue()].isEmpty()) {
-                                                OnClickListener(studentInformation.getStudentName(), studentInformation.getGradsDataTheme().get(index).getThemeTitle(),
-                                                        grads[picker.getValue()], grade, header.get(index).getText().toString());
-                                                Log.e("TAG", " grades " + grads[picker.getValue()]);
-                                            }
-                                            d.dismiss();
-                                        }
-                                    });
-                                    cencel.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            d.dismiss();
-                                        }
-                                    });
-                                    d.show();
-//
                                 }
-                            });
-                        }
 
-                        }
+                                picker.setDisplayedValues(grads);
+                                picker.setWrapSelectorWheel(false);
+                                picker.setOnValueChangedListener(TableActivity.this);
+                                set.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        Log.e("TAG", grads[picker.getValue()]);
+                                        Log.e("TAG", " picker " + String.valueOf(picker.getValue()));
+//                                        tv.setText(grads[picker.getValue()]);
+                                        if (grads[picker.getValue()] != null & !grads[picker.getValue()].isEmpty()) {
+                                            OnClickListener(studentInformation.getStudentName(), studentInformation.getGradsDataTheme().get(index).getThemeTitle(),
+                                                    grads[picker.getValue()], grade, header.get(index).getText().toString());
+                                            Log.e("TAG", " grades " + grads[picker.getValue()]);
+                                        }
+                                        d.dismiss();
+                                    }
+                                });
+                                cancel.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        d.dismiss();
+                                    }
+                                });
+                                d.show();
+//
+                            }
+                        });
+                    }
+
+                }
 //                    }
 
 
@@ -381,7 +382,8 @@ public class TableActivity extends ActionBarActivity implements NumberPicker.OnV
     public class RowTablesGrades {
         private String studentName;
         private ArrayList<GradsDataTheme> themes;
-        public RowTablesGrades(){
+
+        public RowTablesGrades() {
         }
 
         public void setGradsDataTheme(ArrayList<GradsDataTheme> themes) {
@@ -407,7 +409,8 @@ public class TableActivity extends ActionBarActivity implements NumberPicker.OnV
         private String themeTitle;
         private String data;
         private ArrayList<String> grads;
-        public GradsDataTheme(){
+
+        public GradsDataTheme() {
             grads = new ArrayList<>();
         }
 
@@ -459,7 +462,6 @@ public class TableActivity extends ActionBarActivity implements NumberPicker.OnV
 
     private void OnClickListener(String nameStudent, String nameTitleTheme, String grades, TextView grade, String data) {
         if (grades.length() > 0 && getIntent().getStringExtra(ID_GROUP) != null && getIntent().getStringExtra(ID_SUBJECT) != null) {
-            database = new TeacherDataBase(TableActivity.this).getWritableDatabase();
 //                                                Log.e("TAG", "grads " + grades[0] + " student name " + info.getStudentName());
             String tableStudents = TeacherDataBase.StudentTable.TABLE_NAME;
             String[] fieldsStudents = {TeacherDataBase.StudentTable.ID, TeacherDataBase.StudentTable._ID_TEACHER,
@@ -468,20 +470,22 @@ public class TableActivity extends ActionBarActivity implements NumberPicker.OnV
             String whereStudents = TeacherDataBase.StudentTable._ID_GROUP + " = " + getIntent().getStringExtra(ID_GROUP) + " and " +
                     TeacherDataBase.StudentTable._ID_TEACHER + " = " + LoginActivity.getIdTeacher() + " and " +
                     TeacherDataBase.StudentTable.STUDENT_NAME + " = '" + nameStudent + "' ;";
-            Cursor student = database.query(tableStudents, fieldsStudents, whereStudents, null, null, null, null);
+
+            Cursor student = getContentResolver().query(Uri.parse(TeacherContentProvider.CONTENT_URI + "/"
+                    + tableStudents), fieldsStudents, whereStudents, null, null);
             String idStudent = null;
             String idTheme = null;
             String idLessen = null;
             Log.e("TAG", "theme bed");
+
             String tableTheme = TeacherDataBase.ThemeTable.TABLE_NAME;
             String[] fieldsTheme = {TeacherDataBase.ThemeTable.ID, TeacherDataBase.ThemeTable.ID_SUBJECT,
                     TeacherDataBase.ThemeTable.ID_SUBJECT, TeacherDataBase.ThemeTable.TITLE};
             String whereTheme = TeacherDataBase.ThemeTable.ID_SUBJECT + " = " + getIntent().getStringExtra(ID_SUBJECT) + " and " +
                     TeacherDataBase.ThemeTable.ID_GROUP + " = " + getIntent().getStringExtra(ID_GROUP) + " and " +
                     TeacherDataBase.ThemeTable.TITLE + " = '" + nameTitleTheme + "'  ;";
-
-            Cursor theme = database.query(tableTheme, fieldsTheme, whereTheme, null, null, null, null);
-
+            Cursor theme = getContentResolver().query(Uri.parse(TeacherContentProvider.CONTENT_URI + "/"
+                    + tableTheme), fieldsTheme, whereTheme, null, null);
             if (theme.moveToFirst()) {
                 Log.e("TAG", "theme okey");
                 idTheme = theme.getString(theme.getColumnIndex(TeacherDataBase.ThemeTable.ID));
@@ -489,13 +493,13 @@ public class TableActivity extends ActionBarActivity implements NumberPicker.OnV
                 String[] fieldsLessens = {TeacherDataBase.LessonsTable.ID, TeacherDataBase.LessonsTable._ID_GROUP,
                         TeacherDataBase.LessonsTable._ID_TEACHER, TeacherDataBase.LessonsTable._ID_THEME,
                         TeacherDataBase.LessonsTable.DATE_};
-
                 String whereLessens = TeacherDataBase.LessonsTable._ID_THEME + " = " + idTheme + " " + " and " +
                         TeacherDataBase.LessonsTable._ID_GROUP + " = " + getIntent().getStringExtra(ID_GROUP) + "  and " +
                         TeacherDataBase.LessonsTable.DATE_ + " = '" + data + "'  and " +
                         TeacherDataBase.LessonsTable._ID_TEACHER + " = " + LoginActivity.getIdTeacher() + " ;";
 
-                Cursor lessen = database.query(tableLessens, fieldsLessens, whereLessens, null, null, null, null);
+                Cursor lessen = getContentResolver().query(Uri.parse(TeacherContentProvider.CONTENT_URI + "/"
+                        + tableLessens), fieldsLessens, whereLessens, null, null);
                 if (lessen.moveToFirst()) {
                     do {
                         idLessen = lessen.getString(lessen.getColumnIndex(TeacherDataBase.LessonsTable.ID));
@@ -508,13 +512,15 @@ public class TableActivity extends ActionBarActivity implements NumberPicker.OnV
                             String whereAbsence = TeacherDataBase.GradesTable.ID_LESSON + " = " + idLessen + " " + " and " +
                                     TeacherDataBase.GradesTable.ID_STUDENT + " = " + idStudent + " ;";
 
-                            Cursor absence = database.query(tableAbsence, fieldsAbsence, whereAbsence, null, null, null, null);
+                            Cursor absence = getContentResolver().query(Uri.parse(TeacherContentProvider.CONTENT_URI + "/"
+                                    + tableAbsence), fieldsAbsence, whereAbsence, null, null);
                             ArrayList absenceList = new ArrayList();
                             if (absence.moveToFirst()) {
                                 do {
                                     absenceList.add(absence.getString(absence.getColumnIndex(TeacherDataBase.GradesTable.MARKS)));
                                 } while (absence.moveToNext());
                             }
+                            absence.close();
                             Boolean nb = false;
                             for (int i = 0; i < absenceList.size(); i++) {
 
@@ -527,8 +533,10 @@ public class TableActivity extends ActionBarActivity implements NumberPicker.OnV
                                 content.put(TeacherDataBase.GradesTable.ID_STUDENT, idStudent);
                                 content.put(TeacherDataBase.GradesTable.ID_LESSON, idLessen);
                                 content.put(TeacherDataBase.GradesTable.MARKS, grades);
-                                database.insert(TeacherDataBase.GradesTable.TABLE_NAME, null, content);
-                                if(grade.getText().toString().length()>0) {
+                                getContentResolver().insert(Uri.parse(TeacherContentProvider.CONTENT_URI + "/"
+                                        + TeacherDataBase.GradesTable.TABLE_NAME), content);
+
+                                if (grade.getText().toString().length() > 0) {
                                     grades = grade.getText().toString() + "," + grades;
                                 }
                                 grade.setText(grades);
@@ -540,9 +548,11 @@ public class TableActivity extends ActionBarActivity implements NumberPicker.OnV
                                 Toast.makeText(getApplication(), " Студент відсутній  ", Toast.LENGTH_LONG).show();
                             }
                         }
+                        student.close();
                     }
                     while (lessen.moveToNext());
                 }
+                lessen.close();
             }
         } else {
             Log.e("TAG", "Error");

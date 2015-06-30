@@ -2,10 +2,10 @@ package com.example.dima.teacherorganizer.Activity;
 
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Paint;
-import android.support.v7.app.ActionBarActivity;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -13,6 +13,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.example.dima.teacherorganizer.Activity.TeacherRegistration.NotEmptyValidator;
+import com.example.dima.teacherorganizer.DataBase.TeacherContentProvider;
 import com.example.dima.teacherorganizer.DataBase.TeacherDataBase;
 import com.example.dima.teacherorganizer.NavigationDrawer;
 import com.example.dima.teacherorganizer.R;
@@ -20,8 +22,6 @@ import com.rengwuxian.materialedittext.MaterialEditText;
 import com.rengwuxian.materialedittext.validation.RegexpValidator;
 
 import static com.example.dima.teacherorganizer.Activity.TeacherRegistration.setSettingMaterialEditText;
-
-import com.example.dima.teacherorganizer.Activity.TeacherRegistration.NotEmptyValidator;
 
 
 public class LoginActivity extends ActionBarActivity {
@@ -57,17 +57,19 @@ private static String idTeacher;
                 NotEmptyValidator notEmpty = new NotEmptyValidator(getResources().getString(R.string.not_empty_warning));
                 login.addValidator(notEmpty);
                 password.addValidator(notEmpty);
-                TeacherDataBase db = new TeacherDataBase(LoginActivity.this);
-                SQLiteDatabase database = db.getWritableDatabase();
+
                 if (login.validate() & password.validate()) {
-                    if (TeacherRegistration.isValidationLogin(login.getText().toString(), database)
+                    if (TeacherRegistration.isValidationLogin(login.getText().toString(),LoginActivity.this)
                             | login.getText().toString().equals("admin")) {
-                        if (isValidationPassword(password.getText().toString(), login.getText().toString(), database)
+                        if (isValidationPassword(password.getText().toString(), login.getText().toString())
                                 | password.getText().toString().equals("admin")) {
                             // добавить вход только в данный профель
-                            Cursor cursor = database.query(TeacherDataBase.TeachersTable.TABLE_NAME, new String[]{TeacherDataBase.TeachersTable.ID,
-                                            TeacherDataBase.TeachersTable.LOGIN}, TeacherDataBase.TeachersTable.LOGIN + " = ? ",
-                                    new String[]{login.getText().toString()}, null, null, null);
+
+                            Cursor cursor = getContentResolver().query(Uri.parse(
+                                    TeacherContentProvider.CONTENT_URI + "/" + TeacherDataBase.TeachersTable.TABLE_NAME),new String[]{TeacherDataBase.TeachersTable.ID,
+                                            TeacherDataBase.TeachersTable.LOGIN},TeacherDataBase.TeachersTable.LOGIN + " = ? ",
+                                    new String[]{login.getText().toString()},null);
+
                             if (cursor.moveToFirst()) {
                                 idTeacher = cursor.getString(cursor.getColumnIndex(TeacherDataBase.ThemeTable.ID));
                                 try {
@@ -82,7 +84,7 @@ private static String idTeacher;
                             }else {
                                 Toast.makeText(getApplication(), " Не вышло зайти в учетную запись ", Toast.LENGTH_LONG).show();
                             }
-
+                            cursor.close();
                         } else {
                             login.validateWith(validatorLogin);
                             password.validateWith(validatorLogin);
@@ -119,13 +121,15 @@ private static String idTeacher;
         return super.onOptionsItemSelected(item);
     }
 
-    public boolean isValidationPassword(final String password, String login, final SQLiteDatabase database) {
+    public boolean isValidationPassword(final String password, String login) {
         boolean result = false;
-        final SQLiteDatabase finalDb = database;
 
-        Cursor cursor = finalDb.query(TeacherDataBase.TeachersTable.TABLE_NAME,
-                new String[]{TeacherDataBase.TeachersTable.LOGIN, TeacherDataBase.TeachersTable.PASSWORD},
-                TeacherDataBase.TeachersTable.LOGIN + " = ? ", new String[]{login}, null, null, null);
+
+
+        Cursor cursor = getContentResolver().query(Uri.parse(
+                        TeacherContentProvider.CONTENT_URI + "/" +TeacherDataBase.TeachersTable.TABLE_NAME),new String[]{TeacherDataBase.TeachersTable.LOGIN, TeacherDataBase.TeachersTable.PASSWORD},
+                TeacherDataBase.TeachersTable.LOGIN + " = ? ", new String[]{login}, null);
+
 
         if (cursor.moveToFirst()) {
             do {

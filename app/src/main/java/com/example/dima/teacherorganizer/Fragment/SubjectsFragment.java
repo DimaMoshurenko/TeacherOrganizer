@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -23,6 +24,7 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.example.dima.teacherorganizer.Activity.LoginActivity;
 import com.example.dima.teacherorganizer.Activity.SubjectsTeacherActivity;
+import com.example.dima.teacherorganizer.DataBase.TeacherContentProvider;
 import com.example.dima.teacherorganizer.DataBase.TeacherDataBase;
 import com.example.dima.teacherorganizer.R;
 import com.example.dima.teacherorganizer.Activity.SubjectRegistration;
@@ -33,14 +35,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SubjectsFragment extends Fragment implements AbsListView.OnItemClickListener,
-        LoaderManager.LoaderCallbacks<Cursor> , AbsListView.OnItemLongClickListener {
+        LoaderManager.LoaderCallbacks<Cursor>, AbsListView.OnItemLongClickListener {
 
     private OnFragmentInteractionListener mListener;
-
     private ListView mListView;
-
     private SimpleCursorAdapter mAdapter;
-    private SQLiteDatabase database;
     private String[] from;
     private int[] to;
     private ButtonFloat addSubject;
@@ -58,12 +57,10 @@ public class SubjectsFragment extends Fragment implements AbsListView.OnItemClic
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_subjects_item, container, false);
         addSubject = (ButtonFloat) view.findViewById(R.id.float_button_subjects);
-
-        database = new TeacherDataBase(getActivity()).getWritableDatabase();
-        Cursor cursor = database.query(TeacherDataBase.SubjectsTable.TABLE_NAME,
-                new String[]{TeacherDataBase.SubjectsTable.ID, TeacherDataBase.SubjectsTable.SUBJECT,
-                        TeacherDataBase.SubjectsTable.NUMBER_SUBJECT,TeacherDataBase.SubjectsTable.ID_TEACHER},
-                TeacherDataBase.GroupsTable.ID_TEACHER + " = ? ", new String[]{LoginActivity.getIdTeacher()}, null, null, null, null);
+        Cursor cursor = getActivity().getContentResolver().query(Uri.parse(TeacherContentProvider.CONTENT_URI + "/" +
+                        TeacherDataBase.SubjectsTable.TABLE_NAME), new String[]{TeacherDataBase.SubjectsTable.ID, TeacherDataBase.SubjectsTable.SUBJECT,
+                        TeacherDataBase.SubjectsTable.NUMBER_SUBJECT, TeacherDataBase.SubjectsTable.ID_TEACHER},
+                TeacherDataBase.GroupsTable.ID_TEACHER + " = ? ", new String[]{LoginActivity.getIdTeacher()}, null, null);
 
         from = new String[]{TeacherDataBase.SubjectsTable.SUBJECT, TeacherDataBase.SubjectsTable.NUMBER_SUBJECT};
         to = new int[]{R.id.teacher_subjects, R.id.number_list_teacher_subject};
@@ -75,11 +72,13 @@ public class SubjectsFragment extends Fragment implements AbsListView.OnItemClic
         addSubject.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Cursor cursor = database.query(TeacherDataBase.GroupsTable.TABLE_NAME,
-                        new String[]{TeacherDataBase.GroupsTable.ID,TeacherDataBase.GroupsTable.ID_TEACHER},
-                        TeacherDataBase.GroupsTable.ID_TEACHER + " = ? ", new String[]{LoginActivity.getIdTeacher()}, null, null, null, null);
+
+                Cursor cursor = getActivity().getContentResolver().query(Uri.parse(TeacherContentProvider.CONTENT_URI + "/" +
+                                TeacherDataBase.GroupsTable.TABLE_NAME), new String[]{TeacherDataBase.GroupsTable.ID, TeacherDataBase.GroupsTable.ID_TEACHER},
+                        TeacherDataBase.GroupsTable.ID_TEACHER + " = ? ", new String[]{LoginActivity.getIdTeacher()}, null, null);
+
                 cursor.moveToLast();
-                if (LoginActivity.getIdTeacher() != null && cursor.getCount()>0) {
+                if (LoginActivity.getIdTeacher() != null && cursor.getCount() > 0) {
                     Intent myIntent = new Intent(getActivity(), SubjectRegistration.class);
                     startActivity(myIntent);
                 } else {
@@ -116,12 +115,12 @@ public class SubjectsFragment extends Fragment implements AbsListView.OnItemClic
         if (null != mListener) {
             TextView subject = (TextView) view.findViewById(R.id.teacher_subjects);
             Log.e("TAG", "subject " + String.valueOf(subject.getText()));
-            database = new TeacherDataBase(getActivity()).getWritableDatabase();
             Intent myIntent = new Intent(getActivity(), SubjectsTeacherActivity.class);
-            Cursor cursor = database.query(TeacherDataBase.SubjectsTable.TABLE_NAME,
-                    new String[]{TeacherDataBase.SubjectsTable.SUBJECT, TeacherDataBase.SubjectsTable.ID},
-                    TeacherDataBase.SubjectsTable.SUBJECT + " = ? ", new String[]{subject.getText().toString()}, null, null, null, null);
-            String idSubjects = new String();
+            Cursor cursor = getActivity().getContentResolver().query(Uri.parse(TeacherContentProvider.CONTENT_URI + "/" +
+                            TeacherDataBase.SubjectsTable.TABLE_NAME), new String[]{TeacherDataBase.SubjectsTable.SUBJECT, TeacherDataBase.SubjectsTable.ID},
+                    TeacherDataBase.SubjectsTable.SUBJECT + " = ? ", new String[]{subject.getText().toString()}, null, null);
+
+            String idSubjects = "";
             if (cursor.moveToFirst()) {
                 do {
                     idSubjects = cursor.getString(cursor.getColumnIndex(TeacherDataBase.SubjectsTable.ID));
@@ -131,10 +130,7 @@ public class SubjectsFragment extends Fragment implements AbsListView.OnItemClic
 
             myIntent.putExtra(SubjectsTeacherActivity.ID_SUBJECT, idSubjects);
             startActivity(myIntent);
-
-
-//            startActivityForResult(myIntent, 0);
-
+            
             // Notify the active callbacks interface (the activity, if the
             // fragment is attached to one) that an item has been selected.
             mListener.onFragmentInteraction(position);
@@ -175,13 +171,10 @@ public class SubjectsFragment extends Fragment implements AbsListView.OnItemClic
         if (null != mListener) {
             TextView group = (TextView) view.findViewById(R.id.teacher_subjects);
 
-            database = new TeacherDataBase(getActivity()).getWritableDatabase();
-
-            Cursor cursor = database.query(TeacherDataBase.SubjectsTable.TABLE_NAME,
-                    new String[]{TeacherDataBase.SubjectsTable.ID, TeacherDataBase.SubjectsTable.ID_TEACHER,TeacherDataBase.SubjectsTable.SUBJECT},
-                    TeacherDataBase.SubjectsTable.SUBJECT + " =  '"+group.getText().toString()+"' and "+
-                            TeacherDataBase.SubjectsTable.ID_TEACHER+" = "+LoginActivity.getIdTeacher(),null,null, null, null, null);
-
+            Cursor cursor = getActivity().getContentResolver().query(Uri.parse(TeacherContentProvider.CONTENT_URI + "/" +
+                            TeacherDataBase.SubjectsTable.TABLE_NAME), new String[]{TeacherDataBase.SubjectsTable.ID, TeacherDataBase.SubjectsTable.ID_TEACHER, TeacherDataBase.SubjectsTable.SUBJECT},
+                    TeacherDataBase.SubjectsTable.SUBJECT + " =  '" + group.getText().toString() + "' and " +
+                            TeacherDataBase.SubjectsTable.ID_TEACHER + " = " + LoginActivity.getIdTeacher(), null, null);
             String idSubject = null;
             String nameSubject = null;
             if (cursor.moveToFirst()) {
@@ -190,7 +183,7 @@ public class SubjectsFragment extends Fragment implements AbsListView.OnItemClic
                     nameSubject = cursor.getString(cursor.getColumnIndex(TeacherDataBase.SubjectsTable.SUBJECT));
                 } while (cursor.moveToNext());
             }
-
+            cursor.close();
             final String finalIdSubject = idSubject;
             new MaterialDialog.Builder(getActivity())
                     .title(R.string.delete_group)
@@ -201,26 +194,23 @@ public class SubjectsFragment extends Fragment implements AbsListView.OnItemClic
                         @Override
                         public void onPositive(MaterialDialog dialog) {
                             try {
+                                getActivity().getContentResolver().delete(Uri.parse(TeacherContentProvider.CONTENT_URI + "/" +
+                                                TeacherDataBase.SubjectsTable.TABLE_NAME),
+                                        TeacherDataBase.SubjectsTable.ID + " = ?", new String[]{finalIdSubject});
 
-                                database.delete(TeacherDataBase.SubjectsTable.TABLE_NAME,
-                                        TeacherDataBase.SubjectsTable.ID+ " = ?",new String[]{finalIdSubject} );
+                                getActivity().getContentResolver().delete(Uri.parse(TeacherContentProvider.CONTENT_URI + "/" +
+                                                TeacherDataBase.TeacherSubjectTable.TABLE_NAME),TeacherDataBase.TeacherSubjectTable.SUBJECT_ID + " = " + finalIdSubject +
+                                        " and " + TeacherDataBase.TeacherSubjectTable.TEACHER_ID + " = " + LoginActivity.getIdTeacher(), null);
 
-                                database.delete(TeacherDataBase.TeacherSubjectTable.TABLE_NAME,
-                                        TeacherDataBase.TeacherSubjectTable.SUBJECT_ID+ " = "+finalIdSubject+
-                                        " and "+ TeacherDataBase.TeacherSubjectTable.TEACHER_ID+" = "+LoginActivity.getIdTeacher()
-                                        ,null);
-
-
-
-                                database.delete(TeacherDataBase.ThemeTable.TABLE_NAME,
-                                        TeacherDataBase.ThemeTable.ID_SUBJECT+ " = ?",new String[]{finalIdSubject});
+                                getActivity().getContentResolver().delete(Uri.parse(TeacherContentProvider.CONTENT_URI + "/" +
+                                                TeacherDataBase.ThemeTable.TABLE_NAME),
+                                        TeacherDataBase.ThemeTable.ID_SUBJECT + " = ?", new String[]{finalIdSubject});
                                 mListView.notifyAll();
                                 mListView.deferNotifyDataSetChanged();
                                 dialog.dismiss();
                             } catch (Exception e) {
                                 e.printStackTrace();
                             } finally {
-                                database.close();
                                 dialog.dismiss();
                             }
                         }

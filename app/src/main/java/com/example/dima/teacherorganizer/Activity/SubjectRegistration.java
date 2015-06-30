@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -19,6 +20,7 @@ import android.widget.CompoundButton;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.example.dima.teacherorganizer.DataBase.TeacherContentProvider;
 import com.example.dima.teacherorganizer.DataBase.TeacherDataBase;
 import com.example.dima.teacherorganizer.NavigationDrawer;
 import com.example.dima.teacherorganizer.R;
@@ -33,34 +35,31 @@ import static com.example.dima.teacherorganizer.Activity.TeacherRegistration.set
 
 public class SubjectRegistration extends ActionBarActivity {
 
-    private SQLiteDatabase database;
+
     private List<ModelGroupsList> listGroups;
-    private MaterialAutoCompleteTextView groups;
     private AdapterGroups adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        database = new TeacherDataBase(SubjectRegistration.this).getWritableDatabase();
 
         listGroups = new ArrayList<>();
         setContentView(R.layout.activity_subject_registration);
-        database = new TeacherDataBase(this).getWritableDatabase();
         final MaterialEditText newSubject = (MaterialEditText) findViewById(R.id.new_theme);
         final MaterialEditText numberSubject = (MaterialEditText) findViewById(R.id.number_subject);
         ButtonFlat addSubject = (ButtonFlat) findViewById(R.id.add_subject);
         ListView groupsList = (ListView) findViewById(R.id.set_list_group_subjects);
-        Cursor cursor = database.query(TeacherDataBase.GroupsTable.TABLE_NAME, new String[]{
-                TeacherDataBase.GroupsTable.ID, TeacherDataBase.GroupsTable.GROUP_}, null, null, null, null, null);
+
+        Cursor cursor = getContentResolver().query(Uri.parse(TeacherContentProvider.CONTENT_URI + "/" + TeacherDataBase.GroupsTable.TABLE_NAME), new String[]{
+                TeacherDataBase.GroupsTable.ID, TeacherDataBase.GroupsTable.GROUP_}, null, null, null);
         if (cursor.moveToFirst()) {
             do {
                 listGroups.add(new ModelGroupsList(cursor.getString(cursor.getColumnIndex(TeacherDataBase.GroupsTable.GROUP_))));
 
             } while (cursor.moveToNext());
         }
-
+        cursor.close();
         adapter = new AdapterGroups(this, listGroups);
-//                new ArrayAdapter<String>(this, R.layout.item_list_group_subjects, R.id.groups_checkbox, listGroups);
         groupsList.setAdapter(adapter);
         setSettingMaterialEditText(newSubject, getString(R.string.new_subject), this);
         setSettingMaterialEditText(numberSubject, getString(R.string.number_subject), this);
@@ -107,7 +106,7 @@ public class SubjectRegistration extends ActionBarActivity {
                 new TeacherRegistration.NotEmptyValidator(getString(R.string.not_empty_warning));
         newSubject.addValidator(notEmptyValidator);
         numberSubject.addValidator(notEmptyValidator);
-        if (newSubject.validate()&numberSubject.validate()) {
+        if (newSubject.validate() & numberSubject.validate()) {
 
 
             if (LoginActivity.getIdTeacher() != null) {
@@ -117,10 +116,9 @@ public class SubjectRegistration extends ActionBarActivity {
                 for (int i = 0; i < list.size(); i++) {
                     if (list.get(i).isChecked()) {
                         no = true;
-                        Cursor cursor = database.query(TeacherDataBase.GroupsTable.TABLE_NAME,
-                                new String[]{TeacherDataBase.GroupsTable.ID,
-                                        TeacherDataBase.GroupsTable.GROUP_}, null, null, null, null, null);
-
+                        Cursor cursor = getContentResolver().query(Uri.parse(TeacherContentProvider.CONTENT_URI + "/"
+                                + TeacherDataBase.GroupsTable.TABLE_NAME), new String[]{TeacherDataBase.GroupsTable.ID,
+                                TeacherDataBase.GroupsTable.GROUP_}, null, null, null);
                         if (cursor.moveToFirst()) {
                             do {
                                 if (list.get(i).getNameGroup().equals(cursor.getString(
@@ -131,7 +129,10 @@ public class SubjectRegistration extends ActionBarActivity {
                                         subject.put(TeacherDataBase.SubjectsTable.ID_TEACHER, LoginActivity.getIdTeacher());
 
                                         subject.put(TeacherDataBase.SubjectsTable.NUMBER_SUBJECT, numberSubject.getText().toString());
-                                        final long idSubject = database.insert(TeacherDataBase.SubjectsTable.TABLE_NAME, null, subject);
+
+                                        Uri uri = getContentResolver().insert(Uri.parse(TeacherContentProvider.CONTENT_URI + "/"
+                                                + TeacherDataBase.SubjectsTable.TABLE_NAME), subject);
+                                        final long idSubject = Integer.valueOf(uri.getLastPathSegment());
                                         Log.e("TAG", "id idSubject " + idSubject);
 
                                         ContentValues content = new ContentValues();
@@ -140,8 +141,8 @@ public class SubjectRegistration extends ActionBarActivity {
                                         content.put(TeacherDataBase.TeacherSubjectTable.SUBJECT_ID, idSubject);
                                         content.put(TeacherDataBase.TeacherSubjectTable.GROUP_ID, cursor.getString(
                                                 cursor.getColumnIndex(TeacherDataBase.GroupsTable.ID)));
-                                        database.insert(TeacherDataBase.TeacherSubjectTable.TABLE_NAME, null, content);
-                                        Log.e("TAG", " add TeacherSubjectTable ");
+                                        getContentResolver().insert(Uri.parse(TeacherContentProvider.CONTENT_URI + "/"
+                                                + TeacherDataBase.TeacherSubjectTable.TABLE_NAME), content);
                                         Log.e("TAG", "List groups " + String.valueOf(list.get(i).getNameGroup()) + " cursor " + cursor.getString(
                                                 cursor.getColumnIndex(TeacherDataBase.GroupsTable.GROUP_)));
                                     }
@@ -156,7 +157,7 @@ public class SubjectRegistration extends ActionBarActivity {
                 }
                 if (no) {
                     // testing
-                    Log.e("TAG"," пмвталоиталпотидл ");
+                    Log.e("TAG", " пмвталоиталпотидл ");
                     Intent intent = new Intent(SubjectRegistration.this, NavigationDrawer.class);
                     startActivity(intent);
                     finish();

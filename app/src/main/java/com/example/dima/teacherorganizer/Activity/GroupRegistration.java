@@ -2,14 +2,14 @@ package com.example.dima.teacherorganizer.Activity;
 
 import android.content.ContentValues;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
-import android.support.v7.app.ActionBarActivity;
+import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.example.dima.teacherorganizer.DataBase.TeacherContentProvider;
 import com.example.dima.teacherorganizer.DataBase.TeacherDataBase;
 import com.example.dima.teacherorganizer.NavigationDrawer;
 import com.example.dima.teacherorganizer.R;
@@ -21,8 +21,6 @@ import static com.example.dima.teacherorganizer.Activity.TeacherRegistration.set
 
 public class GroupRegistration extends ActionBarActivity {
 
-    private SQLiteDatabase database;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,9 +28,9 @@ public class GroupRegistration extends ActionBarActivity {
         final MaterialEditText nameGroup = (MaterialEditText) findViewById(R.id.new_name_group);
         final MaterialEditText nameKuratora = (MaterialEditText) findViewById(R.id.name_kuratora);
         final MaterialEditText kuratoraPhoneNumber = (MaterialEditText) findViewById(R.id.number_kuratora);
-        setSettingMaterialEditText(nameGroup,getResources().getString(R.string.group),GroupRegistration.this);
-        setSettingMaterialEditText(nameKuratora,getResources().getString(R.string.name_kuratora),GroupRegistration.this);
-        setSettingMaterialEditText(kuratoraPhoneNumber,getResources().getString(R.string.number_kuratora),GroupRegistration.this);
+        setSettingMaterialEditText(nameGroup, getResources().getString(R.string.group), GroupRegistration.this);
+        setSettingMaterialEditText(nameKuratora, getResources().getString(R.string.name_kuratora), GroupRegistration.this);
+        setSettingMaterialEditText(kuratoraPhoneNumber, getResources().getString(R.string.number_kuratora), GroupRegistration.this);
         ButtonFlat addGroup = (ButtonFlat) findViewById(R.id.add_group);
         TeacherRegistration.NotEmptyValidator notEmptyValidator =
                 new TeacherRegistration.NotEmptyValidator(getString(R.string.not_empty_warning));
@@ -42,19 +40,19 @@ public class GroupRegistration extends ActionBarActivity {
         addGroup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (nameGroup.validate() & kuratoraPhoneNumber.validate() & nameKuratora.validate())  {
-                    TeacherDataBase db = new TeacherDataBase(GroupRegistration.this);
-                    database = db.getWritableDatabase();
+                if (nameGroup.validate() & kuratoraPhoneNumber.validate() & nameKuratora.validate()) {
+
                     ContentValues content = new ContentValues();
                     content.put(TeacherDataBase.GroupsTable.GROUP_, nameGroup.getText().toString());
                     content.put(TeacherDataBase.GroupsTable.NAME_KURATOTA, nameKuratora.getText().toString());
                     content.put(TeacherDataBase.GroupsTable.ID_TEACHER, LoginActivity.getIdTeacher());
                     content.put(TeacherDataBase.GroupsTable.NUMBER_KURATOTA, kuratoraPhoneNumber.getText().toString());
-                    long idGroup = database.insert(TeacherDataBase.GroupsTable.TABLE_NAME,null,content);
-                    Log.e("TAG", "id group "+ String.valueOf(idGroup));
+                    Uri uri = getContentResolver().insert(Uri.parse(TeacherContentProvider.CONTENT_URI + "/"
+                            + TeacherDataBase.GroupsTable.TABLE_NAME),content);
+                    int idGroup = Integer.valueOf(uri.getLastPathSegment());
                     Intent intent = new Intent(GroupRegistration.this, NavigationDrawer.class);
                     intent.putExtra(TeacherDataBase.GroupsTable.ID, idGroup);
-//                    startActivity(intent);
+                    startActivity(intent);
                     finish();
                 }
             }
